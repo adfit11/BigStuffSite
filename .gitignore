@@ -1,0 +1,4 @@
+source-photos/
+node_modules/
+dist/
+.env
