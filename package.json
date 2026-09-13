@@ -10,7 +10,8 @@
     "admin": "tsx scripts/admin-server.ts",
     "import": "tsx scripts/import-photos.ts",
     "build:data": "tsx scripts/build-public-data.ts",
-    "build": "npm run build:data && vite build",
+    "build:site": "vite build",
+    "build": "npm run build:data && npm run build:site",
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit"
   },
