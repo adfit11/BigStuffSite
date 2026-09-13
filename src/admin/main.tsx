@@ -1,26 +1,546 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "leaflet/dist/leaflet.css";
 import "./styles.css";
+import type {
+  EditorialData,
+  EditorialPhotoEntry,
+  ImportedPhotoEntry,
+  PhotoId
+} from "../shared/types";
+
+type AdminView = "incomplete" | "all" | "tags";
+type SaveState = "idle" | "saving" | "saved" | "error";
+
+const EMPTY_EDITORIAL_PHOTO: EditorialPhotoEntry = {
+  title: "",
+  description: "",
+  tags: []
+};
 
 function AdminApp() {
+  const [photos, setPhotos] = useState<ImportedPhotoEntry[]>([]);
+  const [editorial, setEditorial] = useState<EditorialData>({
+    tags: [],
+    photos: {}
+  });
+  const [selectedId, setSelectedId] = useState<PhotoId | null>(null);
+  const [view, setView] = useState<AdminView>("incomplete");
+  const [newTag, setNewTag] = useState("");
+  const [dirty, setDirty] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [photosResponse, editorialResponse] = await Promise.all([
+          fetch("/api/photos"),
+          fetch("/api/editorial")
+        ]);
+        const loadedPhotos = (await photosResponse.json()) as ImportedPhotoEntry[];
+        const loadedEditorial = (await editorialResponse.json()) as EditorialData;
+        setPhotos(loadedPhotos);
+        setEditorial(loadedEditorial);
+        const firstIncomplete = loadedPhotos.find(
+          (photo) => !isPublishable(photo, loadedEditorial.photos[photo.id])
+        );
+        setSelectedId(firstIncomplete?.id ?? loadedPhotos[0]?.id ?? null);
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : "Load failed");
+      }
+    }
+
+    void loadData();
+  }, []);
+
+  useEffect(() => {
+    function warnIfDirty(event: BeforeUnloadEvent) {
+      if (!dirty) {
+        return;
+      }
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", warnIfDirty);
+    return () => window.removeEventListener("beforeunload", warnIfDirty);
+  }, [dirty]);
+
+  const selectedPhoto = photos.find((photo) => photo.id === selectedId) ?? null;
+  const visiblePhotos = useMemo(() => {
+    if (view === "incomplete") {
+      return photos.filter(
+        (photo) => !isPublishable(photo, editorial.photos[photo.id])
+      );
+    }
+    return photos;
+  }, [editorial.photos, photos, view]);
+  const usageCounts = useMemo(() => getTagUsageCounts(editorial), [editorial]);
+  const publishableCount = photos.filter((photo) =>
+    isPublishable(photo, editorial.photos[photo.id])
+  ).length;
+
+  function updatePhoto(id: PhotoId, updates: Partial<EditorialPhotoEntry>) {
+    setEditorial((current) => ({
+      ...current,
+      photos: {
+        ...current.photos,
+        [id]: {
+          ...EMPTY_EDITORIAL_PHOTO,
+          ...current.photos[id],
+          ...updates
+        }
+      }
+    }));
+    setDirty(true);
+    setSaveState("idle");
+  }
+
+  function addTag() {
+    const normalized = normalizeTag(newTag);
+    if (!normalized || editorial.tags.includes(normalized)) {
+      setNewTag("");
+      return;
+    }
+
+    setEditorial((current) => ({
+      ...current,
+      tags: [...current.tags, normalized].sort((a, b) => a.localeCompare(b))
+    }));
+    setNewTag("");
+    setDirty(true);
+    setSaveState("idle");
+  }
+
+  function deleteTag(tag: string) {
+    if ((usageCounts.get(tag) ?? 0) > 0) {
+      return;
+    }
+
+    setEditorial((current) => ({
+      ...current,
+      tags: current.tags.filter((existingTag) => existingTag !== tag)
+    }));
+    setDirty(true);
+    setSaveState("idle");
+  }
+
+  async function save() {
+    setSaveState("saving");
+    setError(null);
+
+    try {
+      const response = await fetch("/api/editorial", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editorial)
+      });
+
+      if (!response.ok) {
+        const result = (await response.json()) as { error?: string };
+        throw new Error(result.error ?? "Save failed");
+      }
+
+      setDirty(false);
+      setSaveState("saved");
+    } catch (saveError) {
+      setSaveState("error");
+      setError(saveError instanceof Error ? saveError.message : "Save failed");
+    }
+  }
+
+  function selectPhoto(id: PhotoId) {
+    if (dirty && !window.confirm("Discard unsaved changes?")) {
+      return;
+    }
+    setSelectedId(id);
+    setDirty(false);
+    setSaveState("idle");
+  }
+
   return (
     <main className="admin-shell">
-      <header>
-        <p className="eyebrow">Local Admin</p>
-        <h1>Photo metadata editor</h1>
+      <header className="admin-header">
+        <div>
+          <p className="eyebrow">Local Admin</p>
+          <h1>Photo metadata editor</h1>
+          <p className="summary">
+            {photos.length} imported photos, {publishableCount} publishable,{" "}
+            {photos.length - publishableCount} incomplete.
+          </p>
+        </div>
+        <button
+          className="save-button"
+          type="button"
+          onClick={() => void save()}
+          disabled={!dirty || saveState === "saving"}
+        >
+          {saveState === "saving"
+            ? "Saving..."
+            : saveState === "saved"
+              ? "Saved"
+              : "Save"}
+        </button>
       </header>
-      <nav aria-label="Admin views">
-        <button type="button">Incomplete</button>
-        <button type="button">All Photos</button>
-        <button type="button">Tags</button>
+
+      {error ? <p className="error-message">{error}</p> : null}
+
+      <nav aria-label="Admin views" className="admin-tabs">
+        <button
+          className={view === "incomplete" ? "active" : ""}
+          type="button"
+          onClick={() => setView("incomplete")}
+        >
+          Incomplete
+        </button>
+        <button
+          className={view === "all" ? "active" : ""}
+          type="button"
+          onClick={() => setView("all")}
+        >
+          All Photos
+        </button>
+        <button
+          className={view === "tags" ? "active" : ""}
+          type="button"
+          onClick={() => setView("tags")}
+        >
+          Tags
+        </button>
       </nav>
-      <section className="admin-grid">
-        <div className="queue-panel">No imported photos yet.</div>
-        <aside className="editor-panel">Select a photo to edit.</aside>
-      </section>
+
+      {view === "tags" ? (
+        <TagsView
+          tags={editorial.tags}
+          usageCounts={usageCounts}
+          newTag={newTag}
+          onNewTagChange={setNewTag}
+          onAddTag={addTag}
+          onDeleteTag={deleteTag}
+        />
+      ) : (
+        <section className="admin-grid">
+          <PhotoQueue
+            photos={visiblePhotos}
+            editorial={editorial}
+            selectedId={selectedId}
+            onSelect={selectPhoto}
+          />
+          <PhotoEditor
+            photo={selectedPhoto}
+            editorial={selectedPhoto ? editorial.photos[selectedPhoto.id] : undefined}
+            tagList={editorial.tags}
+            onChange={(updates) => {
+              if (selectedPhoto) {
+                updatePhoto(selectedPhoto.id, updates);
+              }
+            }}
+          />
+        </section>
+      )}
     </main>
   );
+}
+
+function PhotoQueue({
+  photos,
+  editorial,
+  selectedId,
+  onSelect
+}: {
+  photos: ImportedPhotoEntry[];
+  editorial: EditorialData;
+  selectedId: PhotoId | null;
+  onSelect: (id: PhotoId) => void;
+}) {
+  if (photos.length === 0) {
+    return <div className="queue-panel empty">No photos in this view.</div>;
+  }
+
+  return (
+    <div className="queue-panel">
+      {photos.map((photo) => {
+        const photoEditorial = editorial.photos[photo.id];
+        const title = photoEditorial?.title || photo.originalFilename;
+        const publishable = isPublishable(photo, photoEditorial);
+        return (
+          <button
+            className={`photo-row ${photo.id === selectedId ? "selected" : ""}`}
+            key={photo.id}
+            type="button"
+            onClick={() => onSelect(photo.id)}
+          >
+            <img src={photo.derivatives.thumb} alt="" />
+            <span>
+              <strong>{title}</strong>
+              <small>{formatDate(photoEditorial?.takenAtOverride ?? photo.takenAt)}</small>
+            </span>
+            <em className={publishable ? "status ready" : "status"}>
+              {publishable ? "Ready" : "Incomplete"}
+            </em>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function PhotoEditor({
+  photo,
+  editorial,
+  tagList,
+  onChange
+}: {
+  photo: ImportedPhotoEntry | null;
+  editorial: EditorialPhotoEntry | undefined;
+  tagList: string[];
+  onChange: (updates: Partial<EditorialPhotoEntry>) => void;
+}) {
+  if (!photo) {
+    return <aside className="editor-panel">Select a photo to edit.</aside>;
+  }
+
+  const draft = { ...EMPTY_EDITORIAL_PHOTO, ...editorial };
+  const latitude = draft.latitudeOverride ?? photo.latitude;
+  const longitude = draft.longitudeOverride ?? photo.longitude;
+  const locationName =
+    draft.displayLocationNameOverride ?? photo.detectedLocationName ?? "";
+  const mapUrl =
+    latitude != null && longitude != null
+      ? `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.01}%2C${
+          latitude - 0.01
+        }%2C${longitude + 0.01}%2C${latitude + 0.01}&layer=mapnik&marker=${latitude}%2C${longitude}`
+      : null;
+
+  return (
+    <aside className="editor-panel">
+      <img className="editor-photo" src={photo.derivatives.large} alt="" />
+      <dl className="facts">
+        <div>
+          <dt>Original</dt>
+          <dd>{photo.originalFilename}</dd>
+        </div>
+        <div>
+          <dt>Date source</dt>
+          <dd>{photo.takenAtSource}</dd>
+        </div>
+      </dl>
+
+      <label>
+        Title
+        <input
+          value={draft.title}
+          onChange={(event) => onChange({ title: event.target.value })}
+        />
+      </label>
+
+      <label>
+        Description
+        <textarea
+          value={draft.description ?? ""}
+          rows={5}
+          onChange={(event) => onChange({ description: event.target.value })}
+        />
+      </label>
+
+      <label>
+        Taken date
+        <input
+          type="datetime-local"
+          value={toDatetimeLocal(draft.takenAtOverride ?? photo.takenAt)}
+          onChange={(event) =>
+            onChange({ takenAtOverride: fromDatetimeLocal(event.target.value) })
+          }
+        />
+      </label>
+
+      <div className="field-grid">
+        <label>
+          Latitude
+          <input
+            type="number"
+            step="any"
+            value={latitude ?? ""}
+            onChange={(event) =>
+              onChange({ latitudeOverride: parseOptionalNumber(event.target.value) })
+            }
+          />
+        </label>
+        <label>
+          Longitude
+          <input
+            type="number"
+            step="any"
+            value={longitude ?? ""}
+            onChange={(event) =>
+              onChange({ longitudeOverride: parseOptionalNumber(event.target.value) })
+            }
+          />
+        </label>
+      </div>
+
+      <label>
+        Display location name
+        <input
+          value={locationName}
+          onChange={(event) =>
+            onChange({ displayLocationNameOverride: event.target.value })
+          }
+        />
+      </label>
+
+      {mapUrl ? (
+        <iframe className="map-preview" src={mapUrl} title="Coordinate preview" />
+      ) : (
+        <div className="map-preview missing">Add coordinates to preview location.</div>
+      )}
+
+      <fieldset>
+        <legend>Tags</legend>
+        {tagList.length === 0 ? (
+          <p className="muted">Create tags in the Tags view first.</p>
+        ) : (
+          <div className="tag-options">
+            {tagList.map((tag) => (
+              <label className="tag-option" key={tag}>
+                <input
+                  type="checkbox"
+                  checked={draft.tags.includes(tag)}
+                  onChange={(event) => {
+                    const tags = event.target.checked
+                      ? [...draft.tags, tag]
+                      : draft.tags.filter((existingTag) => existingTag !== tag);
+                    onChange({ tags });
+                  }}
+                />
+                {tag}
+              </label>
+            ))}
+          </div>
+        )}
+      </fieldset>
+    </aside>
+  );
+}
+
+function TagsView({
+  tags,
+  usageCounts,
+  newTag,
+  onNewTagChange,
+  onAddTag,
+  onDeleteTag
+}: {
+  tags: string[];
+  usageCounts: Map<string, number>;
+  newTag: string;
+  onNewTagChange: (value: string) => void;
+  onAddTag: () => void;
+  onDeleteTag: (tag: string) => void;
+}) {
+  return (
+    <section className="tags-panel">
+      <form
+        className="tag-form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          onAddTag();
+        }}
+      >
+        <label>
+          New tag
+          <input
+            value={newTag}
+            onChange={(event) => onNewTagChange(event.target.value)}
+          />
+        </label>
+        <button type="submit">Add Tag</button>
+      </form>
+
+      <div className="tag-list">
+        {tags.length === 0 ? <p className="muted">No tags yet.</p> : null}
+        {tags.map((tag) => {
+          const usageCount = usageCounts.get(tag) ?? 0;
+          return (
+            <div className="tag-row" key={tag}>
+              <strong>{tag}</strong>
+              <span>{usageCount} photos</span>
+              <button
+                type="button"
+                disabled={usageCount > 0}
+                onClick={() => onDeleteTag(tag)}
+              >
+                Delete
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function isPublishable(
+  photo: ImportedPhotoEntry,
+  editorial: EditorialPhotoEntry | undefined
+): boolean {
+  const latitude = editorial?.latitudeOverride ?? photo.latitude;
+  const longitude = editorial?.longitudeOverride ?? photo.longitude;
+  const locationName =
+    editorial?.displayLocationNameOverride ?? photo.detectedLocationName;
+
+  return Boolean(
+    editorial?.title &&
+      editorial.tags.length > 0 &&
+      latitude != null &&
+      longitude != null &&
+      locationName
+  );
+}
+
+function getTagUsageCounts(editorial: EditorialData): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const photo of Object.values(editorial.photos)) {
+    for (const tag of photo.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+function normalizeTag(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium"
+  }).format(new Date(value));
+}
+
+function toDatetimeLocal(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return date.toISOString().slice(0, 16);
+}
+
+function fromDatetimeLocal(value: string): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+}
+
+function parseOptionalNumber(value: string): number | undefined {
+  if (value.trim() === "") {
+    return undefined;
+  }
+  const number = Number(value);
+  return Number.isNaN(number) ? undefined : number;
 }
 
 createRoot(document.getElementById("root")!).render(
