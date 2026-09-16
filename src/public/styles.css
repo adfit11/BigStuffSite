@@ -485,7 +485,9 @@ button {
   }
 
   .site-title p {
-    display: none;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.2;
   }
 
   .photo-panel {
@@ -532,7 +534,7 @@ button {
 
   .rail-photo {
     display: grid;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
     gap: 8px;
     min-width: 0;
     scroll-snap-align: center;
@@ -563,6 +565,13 @@ button {
     color: #53605b;
     font-size: 14px;
     text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rail-photo time {
+    color: #5c6f68;
+    font-size: 12px;
+    font-weight: 700;
     white-space: nowrap;
   }
 

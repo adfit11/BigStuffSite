@@ -462,6 +462,7 @@ function PhotoRail({
           <img src={assetUrl(photo.derivatives.large)} alt={photo.title} />
           <h2>{photo.title}</h2>
           <p>{photo.displayLocationName}</p>
+          <time dateTime={photo.takenAt}>{formatDate(photo.takenAt)}</time>
           <a href={mapsUrl(photo)} target="_blank" rel="noreferrer">
             Open map
           </a>
