@@ -179,7 +179,7 @@ function PhotoMap({
 }) {
   const elementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.Marker[]>([]);
+  const markersRef = useRef<Map<PhotoId, L.Marker>>(new Map());
 
   useEffect(() => {
     if (!elementRef.current || mapRef.current) {
@@ -196,12 +196,6 @@ function PhotoMap({
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
-    map.createPane("featuredMarkers");
-    const featuredPane = map.getPane("featuredMarkers");
-    if (featuredPane) {
-      featuredPane.style.zIndex = "700";
-    }
-
     mapRef.current = map;
   }, []);
 
@@ -211,26 +205,44 @@ function PhotoMap({
       return;
     }
 
-    for (const marker of markersRef.current) {
-      marker.remove();
+    const nextIds = new Set(photos.map((photo) => photo.id));
+    for (const [photoId, marker] of markersRef.current) {
+      if (!nextIds.has(photoId)) {
+        marker.remove();
+        markersRef.current.delete(photoId);
+      }
     }
 
     const spreadPhotos = applyMarkerSpread(photos);
-    markersRef.current = spreadPhotos.map(({ photo, latitude, longitude }) => {
+    for (const { photo, latitude, longitude } of spreadPhotos) {
+      const existingMarker = markersRef.current.get(photo.id);
+      if (existingMarker) {
+        existingMarker.setLatLng([latitude, longitude]);
+        continue;
+      }
+
       const marker = L.marker([latitude, longitude], {
-        pane: photo.id === featuredPhoto?.id ? "featuredMarkers" : "markerPane",
         icon: L.divIcon({
-          className: `photo-marker ${photo.id === featuredPhoto?.id ? "featured" : ""}`,
-          html: `<img src="${assetUrl(photo.derivatives.thumb)}" alt="">`,
+          className: "photo-marker",
+          html: `<img src="${assetUrl(photo.derivatives.marker)}" alt="" loading="eager" decoding="async">`,
           iconSize: [46, 46],
           iconAnchor: [23, 23]
-        })
+        }),
+        keyboard: false
       });
       marker.on("click", () => onFeature(photo.id));
       marker.addTo(map);
-      return marker;
-    });
-  }, [featuredPhoto, onFeature, photos]);
+      markersRef.current.set(photo.id, marker);
+    }
+  }, [onFeature, photos]);
+
+  useEffect(() => {
+    for (const [photoId, marker] of markersRef.current) {
+      const isFeatured = photoId === featuredPhoto?.id;
+      marker.setZIndexOffset(isFeatured ? 1000 : 0);
+      marker.getElement()?.classList.toggle("featured", isFeatured);
+    }
+  }, [featuredPhoto]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -375,8 +387,11 @@ function PhotoList({
           type="button"
           onClick={() => onFeature(photo.id)}
         >
-          <span>{photo.title}</span>
-          <small>{formatDate(photo.takenAt)}</small>
+          <span>
+            <strong>{photo.title}</strong>
+            <small>{photo.displayLocationName}</small>
+          </span>
+          <time dateTime={photo.takenAt}>{formatDate(photo.takenAt)}</time>
         </button>
       ))}
     </nav>
@@ -393,12 +408,23 @@ function PhotoRail({
   onFeature: (photoId: PhotoId) => void;
 }) {
   const railRef = useRef<HTMLDivElement | null>(null);
+  const isProgrammaticScrollRef = useRef(false);
 
   useEffect(() => {
     const active = railRef.current?.querySelector<HTMLElement>(
       `[data-photo-id="${featuredId}"]`
     );
-    active?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    if (!active) {
+      return;
+    }
+
+    isProgrammaticScrollRef.current = true;
+    window.requestAnimationFrame(() => {
+      active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+      window.setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 450);
+    });
   }, [featuredId]);
 
   return (
@@ -406,6 +432,10 @@ function PhotoRail({
       ref={railRef}
       className="photo-rail"
       onScroll={(event) => {
+        if (isProgrammaticScrollRef.current) {
+          return;
+        }
+
         const rail = event.currentTarget;
         const center = rail.scrollLeft + rail.clientWidth / 2;
         let closest: PublicPhotoEntry | null = null;
@@ -431,6 +461,7 @@ function PhotoRail({
           className={photo.id === featuredId ? "rail-photo active" : "rail-photo"}
           data-photo-id={photo.id}
           key={photo.id}
+          onClick={() => onFeature(photo.id)}
         >
           <img src={assetUrl(photo.derivatives.large)} alt={photo.title} />
           <h2>{photo.title}</h2>

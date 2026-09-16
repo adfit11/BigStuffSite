@@ -42,7 +42,10 @@ export function getPublishablePhotos(
       longitude,
       displayLocationName,
       tags: editorial.tags,
-      derivatives: photo.derivatives
+      derivatives: {
+        ...photo.derivatives,
+        marker: photo.derivatives.marker ?? markerPath(photo.id)
+      }
     });
   }
 
@@ -60,6 +63,10 @@ export function buildPublicData(
     tags: editorialData.tags,
     photos
   };
+}
+
+function markerPath(photoId: string): string {
+  return `/photos/markers/${photoId}.webp`;
 }
 
 function comparePublicPhotos(a: PublicPhotoEntry, b: PublicPhotoEntry): number {

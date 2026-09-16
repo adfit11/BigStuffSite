@@ -10,8 +10,9 @@
     "admin": "tsx scripts/admin-server.ts",
     "import": "tsx scripts/import-photos.ts",
     "build:data": "tsx scripts/build-public-data.ts",
+    "build:markers": "tsx scripts/generate-marker-derivatives.ts",
     "build:site": "vite build",
-    "build": "npm run build:data && npm run build:site",
+    "build": "npm run build:data && npm run build:markers && npm run build:site",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --import tsx --test 'src/**/*.test.ts'",
     "typecheck": "tsc --noEmit"

@@ -300,11 +300,11 @@ button {
 .title-list button {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 14px;
   width: 100%;
-  min-height: 34px;
-  padding: 6px 8px;
+  min-height: 44px;
+  padding: 7px 8px;
   text-align: left;
   color: #4c514f;
   cursor: pointer;
@@ -314,10 +314,22 @@ button {
 }
 
 .title-list button span {
+  display: grid;
+  gap: 2px;
   min-width: 0;
+}
+
+.title-list button strong,
+.title-list button small {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.title-list button strong {
+  color: inherit;
+  font-size: 14px;
+  font-weight: 750;
 }
 
 .title-list button small {
@@ -325,23 +337,16 @@ button {
   font-size: 11px;
 }
 
+.title-list button time {
+  color: #6f7772;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
 .title-list button:hover,
 .title-list button.active {
   color: #17211d;
   background: #eef3ef;
-}
-
-@media (min-width: 1180px) {
-  .title-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-content: start;
-    column-gap: 8px;
-  }
-
-  .title-list-header {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (min-width: 761px) and (max-width: 1120px) {

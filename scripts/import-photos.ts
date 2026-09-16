@@ -12,6 +12,7 @@ const DATA_PATH = "data/photos.json";
 const GEOCODE_CACHE_PATH = "data/geocode-cache.json";
 const THUMB_DIR = "public/photos/thumbs";
 const LARGE_DIR = "public/photos/large";
+const MARKER_DIR = "public/photos/markers";
 const SUPPORTED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 const GEOCODE_PRECISION = 5;
 const GEOCODE_DELAY_MS = 1100;
@@ -108,6 +109,7 @@ async function ensureProjectDirectories() {
   await mkdir(dirname(DATA_PATH), { recursive: true });
   await mkdir(THUMB_DIR, { recursive: true });
   await mkdir(LARGE_DIR, { recursive: true });
+  await mkdir(MARKER_DIR, { recursive: true });
 }
 
 async function listSourceFiles(directory: string): Promise<string[]> {
@@ -204,6 +206,13 @@ async function createDerivatives(
 ): Promise<ImportedPhotoEntry["derivatives"]> {
   const thumbPath = join(THUMB_DIR, `${id}.webp`);
   const largePath = join(LARGE_DIR, `${id}.webp`);
+  const markerPath = join(MARKER_DIR, `${id}.webp`);
+
+  await sharp(filePath)
+    .rotate()
+    .resize({ width: 72, height: 72, fit: "cover", withoutEnlargement: true })
+    .webp({ quality: 56 })
+    .toFile(markerPath);
 
   await sharp(filePath)
     .rotate()
@@ -219,7 +228,8 @@ async function createDerivatives(
 
   return {
     thumb: toPublicPath(thumbPath),
-    large: toPublicPath(largePath)
+    large: toPublicPath(largePath),
+    marker: toPublicPath(markerPath)
   };
 }
 

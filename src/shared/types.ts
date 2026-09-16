@@ -1,5 +1,15 @@
 export type PhotoId = string;
 
+export type ImportedPhotoDerivatives = {
+  thumb: string;
+  large: string;
+  marker?: string;
+};
+
+export type PublicPhotoDerivatives = ImportedPhotoDerivatives & {
+  marker: string;
+};
+
 export type ImportedPhotoEntry = {
   id: PhotoId;
   originalFilename: string;
@@ -9,10 +19,7 @@ export type ImportedPhotoEntry = {
   latitude: number | null;
   longitude: number | null;
   detectedLocationName: string | null;
-  derivatives: {
-    thumb: string;
-    large: string;
-  };
+  derivatives: ImportedPhotoDerivatives;
 };
 
 export type EditorialPhotoEntry = {
@@ -39,10 +46,7 @@ export type PublicPhotoEntry = {
   longitude: number;
   displayLocationName: string;
   tags: string[];
-  derivatives: {
-    thumb: string;
-    large: string;
-  };
+  derivatives: PublicPhotoDerivatives;
 };
 
 export type PublicData = {
