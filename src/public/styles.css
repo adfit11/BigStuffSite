@@ -528,7 +528,6 @@ button {
     overflow-x: auto;
     overscroll-behavior-x: contain;
     padding: 10px 8% 14px;
-    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -537,7 +536,6 @@ button {
     grid-template-rows: auto auto auto auto auto;
     gap: 8px;
     min-width: 0;
-    scroll-snap-align: center;
   }
 
   .rail-photo img {

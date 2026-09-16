@@ -116,6 +116,7 @@ function PublicApp() {
     <main className="public-shell">
       <PhotoMap
         photos={filteredPhotos}
+        totalPhotoCount={loadState.data.photos.length}
         featuredPhoto={featuredPhoto}
         onFeature={featurePhoto}
       />
@@ -170,10 +171,12 @@ function PublicApp() {
 
 function PhotoMap({
   photos,
+  totalPhotoCount,
   featuredPhoto,
   onFeature
 }: {
   photos: PublicPhotoEntry[];
+  totalPhotoCount: number;
   featuredPhoto: PublicPhotoEntry | null;
   onFeature: (photoId: PhotoId) => void;
 }) {
@@ -260,7 +263,7 @@ function PhotoMap({
       <div ref={elementRef} className="map-panel" />
       <header className="site-title">
         <h1>Big Stuff</h1>
-        <p>{photos.length} Big Things found. Millions to go.</p>
+        <p>{totalPhotoCount} Big Things found. Millions to go.</p>
       </header>
     </section>
   );
@@ -405,8 +408,14 @@ function PhotoRail({
 }) {
   const railRef = useRef<HTMLDivElement | null>(null);
   const isProgrammaticScrollRef = useRef(false);
+  const skipNextFeatureSyncRef = useRef(false);
 
   useEffect(() => {
+    if (skipNextFeatureSyncRef.current) {
+      skipNextFeatureSyncRef.current = false;
+      return;
+    }
+
     const active = railRef.current?.querySelector<HTMLElement>(
       `[data-photo-id="${featuredId}"]`
     );
@@ -448,6 +457,7 @@ function PhotoRail({
         }
 
         if (closest && closest.id !== featuredId) {
+          skipNextFeatureSyncRef.current = true;
           onFeature(closest.id);
         }
       }}
