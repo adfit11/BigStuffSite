@@ -301,26 +301,26 @@ function FeaturePanel({
         </button>
       </div>
       <div className="feature-copy">
-        <p className="eyebrow">{formatDate(photo.takenAt)}</p>
-        <h1>{photo.title}</h1>
-        <p className="location">{photo.displayLocationName}</p>
-        {photo.description ? <p>{photo.description}</p> : null}
-        <div className="photo-tags">
-          {photo.tags.map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
+        <div className="feature-meta-line">
+          <h1>{photo.title}</h1>
+          <span className="location">{photo.displayLocationName}</span>
+          <time dateTime={photo.takenAt}>{formatDate(photo.takenAt)}</time>
+          <a
+            className="gps-link"
+            href={mapsUrl(photo)}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Open ${photo.title} location in maps`}
+            title="Open location in maps"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z" />
+              <path d="M9 3v15" />
+              <path d="M15 6v15" />
+            </svg>
+          </a>
         </div>
-        <a
-          className="gps-link"
-          href={mapsUrl(photo)}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Open GPS coordinates
-          <span>
-            {formatCoordinate(photo.latitude)}, {formatCoordinate(photo.longitude)}
-          </span>
-        </a>
+        {photo.description ? <p>{photo.description}</p> : null}
       </div>
     </section>
   );
@@ -546,10 +546,6 @@ function mapsUrl(photo: PublicPhotoEntry): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     query
   )}`;
-}
-
-function formatCoordinate(value: number): string {
-  return value.toFixed(5);
 }
 
 createRoot(document.getElementById("root")!).render(

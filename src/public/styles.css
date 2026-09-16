@@ -125,8 +125,8 @@ button {
 
 .feature-panel {
   display: grid;
-  gap: 10px;
-  padding: 10px 14px 12px;
+  gap: 8px;
+  padding: 8px 14px 10px;
   border-bottom: 1px solid #d7d7d0;
 }
 
@@ -186,62 +186,54 @@ button {
 
 .feature-copy {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(190px, 230px);
-  align-items: end;
-  gap: 4px 14px;
+  gap: 6px;
+}
+
+.feature-meta-line {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(120px, 0.8fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .feature-copy h1 {
   margin: 0;
-  font-size: 24px;
+  overflow: hidden;
+  font-size: 20px;
   line-height: 1.1;
   letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .feature-copy p {
-  margin: 8px 0 0;
+  margin: 0;
   line-height: 1.35;
 }
 
-.eyebrow {
-  margin: 0 0 6px;
+.location {
+  overflow: hidden;
+  color: #53605b;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feature-meta-line time {
   color: #5c6f68;
   font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-}
-
-.location {
-  color: #53605b;
-  font-weight: 700;
-}
-
-.photo-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.photo-tags span {
-  padding: 3px 7px;
-  color: #315e56;
-  font-size: 12px;
-  font-weight: 700;
-  background: #e6f0ec;
-  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .gps-link {
   display: grid;
-  gap: 3px;
-  grid-column: 2;
-  grid-row: 1 / 5;
-  align-self: end;
-  margin-top: 0;
-  padding: 7px 9px;
+  width: 32px;
+  height: 32px;
+  place-items: center;
   color: #25302c;
-  font-weight: 700;
   text-decoration: none;
   border: 1px solid #ccd2c9;
   border-radius: 6px;
@@ -252,11 +244,14 @@ button {
   border-color: #315e56;
 }
 
-.gps-link span {
-  color: #53605b;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 12px;
-  font-weight: 500;
+.gps-link svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
 }
 
 .title-list {
@@ -360,6 +355,14 @@ button {
 
   .feature-copy {
     grid-template-columns: 1fr;
+  }
+
+  .feature-meta-line {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .feature-meta-line .location {
+    grid-column: 1 / -1;
   }
 
   .feature-image-button img {
