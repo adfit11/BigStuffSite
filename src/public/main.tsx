@@ -375,10 +375,6 @@ function PhotoList({
 
   return (
     <nav className="title-list" aria-label="Chronological photo list">
-      <div className="title-list-header">
-        <strong>Photo list</strong>
-        <span>{photos.length} stops</span>
-      </div>
       {photos.map((photo) => (
         <button
           ref={photo.id === featuredId ? selectedRef : null}

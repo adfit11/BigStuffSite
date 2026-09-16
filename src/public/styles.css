@@ -46,8 +46,8 @@ button {
   top: 16px;
   left: 66px;
   z-index: 500;
-  max-width: min(340px, calc(100% - 96px));
-  padding: 10px 12px;
+  max-width: min(510px, calc(100% - 96px));
+  padding: 15px 18px;
   color: #1f2328;
   background: rgb(251 251 248 / 92%);
   border: 1px solid rgb(204 210 201 / 82%);
@@ -58,15 +58,15 @@ button {
 
 .site-title h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 36px;
   line-height: 1;
   letter-spacing: 0;
 }
 
 .site-title p {
-  margin: 5px 0 0;
+  margin: 8px 0 0;
   color: #53605b;
-  font-size: 13px;
+  font-size: 20px;
   line-height: 1.25;
 }
 
@@ -256,7 +256,7 @@ button {
 
 .title-list {
   overflow: auto;
-  padding: 0 14px 14px;
+  padding: 8px 14px 14px;
   border-top: 1px solid #ecefea;
   background:
     linear-gradient(#fbfbf8 30%, rgb(251 251 248 / 0)),
@@ -271,25 +271,6 @@ button {
     100% 22px,
     100% 8px,
     100% 8px;
-}
-
-.title-list-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 0 -14px 6px;
-  padding: 10px 14px;
-  color: #53605b;
-  background: #fbfbf8;
-  border-bottom: 1px solid #ecefea;
-}
-
-.title-list-header strong {
-  color: #25302c;
 }
 
 .title-list button {
