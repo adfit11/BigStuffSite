@@ -456,7 +456,8 @@
       ],
       "displayLocationNameOverride": "Gladysdale, Victoria",
       "latitudeOverride": -37.82025139419449,
-      "longitudeOverride": 145.65121465194363
+      "longitudeOverride": 145.65121465194363,
+      "takenAtOverride": "2019-06-09T00:41:00.000Z"
     },
     "c1143e9f32546114b5cc": {
       "title": "Baramundi",
@@ -492,7 +493,8 @@
       ],
       "latitudeOverride": -37.712090949528886,
       "longitudeOverride": 145.38690718989784,
-      "displayLocationNameOverride": "Coldstream, Victoria"
+      "displayLocationNameOverride": "Coldstream, Victoria-36.75987470655597",
+      "takenAtOverride": "2025-10-04T01:41:00.000Z"
     },
     "2425a8949bfdd251aa97": {
       "title": "Marlin",
@@ -503,7 +505,8 @@
       ],
       "latitudeOverride": -16.9446002010059,
       "longitudeOverride": 145.73857379562347,
-      "displayLocationNameOverride": "Earlville, Queensland"
+      "displayLocationNameOverride": "Earlville, Queensland",
+      "takenAtOverride": "2022-06-26T08:41:00.000Z"
     },
     "22ec9f54628aea78563f": {
       "title": "Opal Bug",
@@ -513,7 +516,8 @@
       ],
       "latitudeOverride": -29.00831947531841,
       "longitudeOverride": 134.7564480703884,
-      "displayLocationNameOverride": "Coober Pedy, SA"
+      "displayLocationNameOverride": "Coober Pedy, SA",
+      "takenAtOverride": "2018-09-24T18:41:00.000Z"
     },
     "22bdc81800f58ab850ac": {
       "title": "Banana",
@@ -524,7 +528,8 @@
       ],
       "latitudeOverride": -30.27448246533664,
       "longitudeOverride": 153.13377678074104,
-      "displayLocationNameOverride": "Coffs Harbour, New South Wales"
+      "displayLocationNameOverride": "Coffs Harbour, New South Wales",
+      "takenAtOverride": "2017-12-27T06:41:00.000Z"
     },
     "4fad8277d69d9e24acae": {
       "title": "Potatoes & Forks",
@@ -534,7 +539,8 @@
       ],
       "latitudeOverride": -38.20938672755458,
       "longitudeOverride": 146.12975283847302,
-      "displayLocationNameOverride": "Trafalgar, Victoria"
+      "displayLocationNameOverride": "Trafalgar, Victoria",
+      "takenAtOverride": "2018-01-20T08:41:00.000Z"
     },
     "494db13b737b2ef68268": {
       "title": "Merino",
@@ -545,7 +551,8 @@
       ],
       "latitudeOverride": -34.772346050278514,
       "longitudeOverride": 149.69144664859252,
-      "displayLocationNameOverride": "Goulburn, New South Wales"
+      "displayLocationNameOverride": "Goulburn, New South Wales",
+      "takenAtOverride": "2017-12-26T08:41:00.000Z"
     },
     "4b36c4ee9fc705bc7204": {
       "title": "Guitar",
@@ -555,7 +562,8 @@
       ],
       "latitudeOverride": -46.09823945775863,
       "longitudeOverride": 168.9467852677669,
-      "displayLocationNameOverride": "Gore, New Zealand"
+      "displayLocationNameOverride": "Gore, New Zealand",
+      "takenAtOverride": "2023-01-13T18:41:00.000Z"
     },
     "52866a8d824f92993a09": {
       "title": "Watermelon",
@@ -566,7 +574,8 @@
       ],
       "latitudeOverride": -37.87648362483984,
       "longitudeOverride": 145.20614637607304,
-      "displayLocationNameOverride": "Wantirna South, Victoria"
+      "displayLocationNameOverride": "Wantirna South, Victoria",
+      "takenAtOverride": "2017-12-26T08:41:00.000Z"
     },
     "549f8b9a2a27c60917fd": {
       "title": "Rolling Pin",
@@ -576,7 +585,8 @@
       ],
       "latitudeOverride": -36.12104517082423,
       "longitudeOverride": 146.8892155742374,
-      "displayLocationNameOverride": "Wodonga, Victoria"
+      "displayLocationNameOverride": "Wodonga, Victoria",
+      "takenAtOverride": "2018-12-26T08:41:00.000Z"
     },
     "5a9278f4e7eab442ebad": {
       "title": "Dunlop Tyre",
@@ -586,7 +596,8 @@
       ],
       "displayLocationNameOverride": "Yamba, South Australia",
       "longitudeOverride": 140.86138692479284,
-      "latitudeOverride": -34.26019141424691
+      "latitudeOverride": -34.26019141424691,
+      "takenAtOverride": "2018-10-05T10:41:00.000Z"
     },
     "5cea5ec7b3143bc3d40e": {
       "title": "Spindle",
@@ -596,7 +607,8 @@
       ],
       "latitudeOverride": -31.438900095657097,
       "longitudeOverride": 152.92488880418588,
-      "displayLocationNameOverride": "Port Macquarie, New South Wales"
+      "displayLocationNameOverride": "Port Macquarie, New South Wales",
+      "takenAtOverride": "2018-01-19T06:41:00.000Z"
     },
     "4f03223b3c142bd18cec": {
       "title": "Ugg Boots",
@@ -607,7 +619,8 @@
       ],
       "latitudeOverride": -32.792986423357945,
       "longitudeOverride": 151.63714162756136,
-      "displayLocationNameOverride": "Thornton, New South Wales"
+      "displayLocationNameOverride": "Thornton, New South Wales",
+      "takenAtOverride": "2018-01-19T08:41:00.000Z"
     },
     "4719269db8a7f1737b5c": {
       "title": "Rock",
@@ -617,7 +630,8 @@
       ],
       "latitudeOverride": -32.615207813525785,
       "longitudeOverride": 152.08031076031847,
-      "displayLocationNameOverride": "North Arm Cove, New South Wales"
+      "displayLocationNameOverride": "North Arm Cove, New South Wales",
+      "takenAtOverride": "2017-12-27T06:41:00.000Z"
     },
     "4259eede918f67fc9605": {
       "title": "Fruits",
@@ -627,7 +641,8 @@
       ],
       "latitudeOverride": -34.137948281832244,
       "longitudeOverride": 142.15949237434737,
-      "displayLocationNameOverride": "Mourquong, New South Wales"
+      "displayLocationNameOverride": "Mourquong, New South Wales",
+      "takenAtOverride": "2018-10-05T03:41:00.000Z"
     },
     "474dadc883b14f6ef3b9": {
       "title": "Jumping Crocodile",
@@ -637,7 +652,8 @@
       ],
       "latitudeOverride": -12.660060438866735,
       "longitudeOverride": 131.33589833201373,
-      "displayLocationNameOverride": "Wak Wak, Northern Territory"
+      "displayLocationNameOverride": "Wak Wak, Northern Territory",
+      "takenAtOverride": "2023-09-25T18:41:00.000Z"
     },
     "628f080b3bd931e02da6": {
       "title": "Lace Monitor",
@@ -647,7 +663,8 @@
       ],
       "latitudeOverride": -33.3512839387313,
       "longitudeOverride": 138.20760390825592,
-      "displayLocationNameOverride": "Crystal Brook, South Australia"
+      "displayLocationNameOverride": "Crystal Brook, South Australia",
+      "takenAtOverride": "2018-09-23T08:41:00.000Z"
     },
     "63d9e89d3cb0813d3a08": {
       "title": "Pen",
@@ -657,7 +674,8 @@
       ],
       "latitudeOverride": -20.405379036323385,
       "longitudeOverride": 148.59254832879876,
-      "displayLocationNameOverride": "Proserpine, Queensland"
+      "displayLocationNameOverride": "Proserpine, Queensland",
+      "takenAtOverride": "2022-01-12T06:41:00.000Z"
     },
     "653dbdd3392004b26598": {
       "title": "Tractor",
@@ -667,7 +685,8 @@
       ],
       "latitudeOverride": -34.30803367942584,
       "longitudeOverride": 142.18674551432954,
-      "displayLocationNameOverride": "Red Cliffs, Victoria"
+      "displayLocationNameOverride": "Red Cliffs, Victoria",
+      "takenAtOverride": "2018-10-06T07:41:00.000Z"
     },
     "6c68050a80c3a5e974ac": {
       "title": "Orange",
@@ -677,7 +696,8 @@
       ],
       "longitudeOverride": 142.15936247803083,
       "latitudeOverride": -34.138025819072375,
-      "displayLocationNameOverride": "Mourquong, New South Wales"
+      "displayLocationNameOverride": "Mourquong, New South Wales",
+      "takenAtOverride": "2018-10-05T13:21:00.000Z"
     },
     "6f4ddab920c1405791f1": {
       "title": "Watermelon",
@@ -687,7 +707,8 @@
       ],
       "latitudeOverride": -37.87648362483984,
       "longitudeOverride": 145.20614637607304,
-      "displayLocationNameOverride": "Wantirna South, Victoria"
+      "displayLocationNameOverride": "Wantirna South, Victoria",
+      "takenAtOverride": "2025-12-25T06:41:00.000Z"
     },
     "6fe9ddd80663a8bc8da1": {
       "title": "Orange",
@@ -698,7 +719,8 @@
       ],
       "latitudeOverride": -34.24642833417183,
       "longitudeOverride": 140.62067310145716,
-      "displayLocationNameOverride": "Monash, South Australia"
+      "displayLocationNameOverride": "Monash, South Australia",
+      "takenAtOverride": "2018-10-05T21:41:00.000Z"
     },
     "7fb54aacefc2a9d4e6e4": {
       "title": "Mango",
@@ -709,7 +731,8 @@
       ],
       "latitudeOverride": -20.04605282046694,
       "longitudeOverride": 148.2284611577393,
-      "displayLocationNameOverride": "Bowen, Queensland"
+      "displayLocationNameOverride": "Bowen, Queensland",
+      "takenAtOverride": "2022-01-12T06:41:00.000Z"
     },
     "f01b81c5d222886435a1": {
       "title": "Pheasant",
@@ -720,7 +743,8 @@
       ],
       "latitudeOverride": -38.07159620488462,
       "longitudeOverride": 145.65576453516277,
-      "displayLocationNameOverride": "Tynong North, Victoria"
+      "displayLocationNameOverride": "Tynong North, Victoria",
+      "takenAtOverride": "2018-01-20T03:41:00.000Z"
     },
     "0d201006b636ac4830f9": {
       "title": "Snake",
@@ -730,7 +754,8 @@
       ],
       "latitudeOverride": -20.001303744634747,
       "longitudeOverride": 148.24792995179334,
-      "displayLocationNameOverride": "Bowen, Queensland"
+      "displayLocationNameOverride": "Bowen, Queensland",
+      "takenAtOverride": "2022-01-12T08:41:00.000Z"
     },
     "16d991e623a761239296": {
       "title": "Eight Ball",
@@ -740,7 +765,8 @@
       ],
       "displayLocationNameOverride": "Port Macquarie, New South Wales",
       "latitudeOverride": -31.45872045914273,
-      "longitudeOverride": 152.871517057179
+      "longitudeOverride": 152.871517057179,
+      "takenAtOverride": "2018-01-19T06:41:00.000Z"
     },
     "69b7847b0b3e4a80fcfb": {
       "title": "Bee Hive",
@@ -750,7 +776,8 @@
       ],
       "latitudeOverride": -30.50835946668394,
       "longitudeOverride": 153.00268972809135,
-      "displayLocationNameOverride": "Urunga, New South Wales"
+      "displayLocationNameOverride": "Urunga, New South Wales",
+      "takenAtOverride": "2018-01-19T06:41:00.000Z"
     },
     "f2ba1fc0c5113be6e47a": {
       "title": "Beer Can",
@@ -760,7 +787,8 @@
       ],
       "displayLocationNameOverride": "Kulgera, NT",
       "latitudeOverride": -25.839473842314042,
-      "longitudeOverride": 133.30020110949886
+      "longitudeOverride": 133.30020110949886,
+      "takenAtOverride": "2018-09-25T04:41:00.000Z"
     },
     "ea250de6ec70e6527b0e": {
       "title": "Bowl",
@@ -771,7 +799,8 @@
       ],
       "latitudeOverride": -31.545520598526,
       "displayLocationNameOverride": "Lake Cathie, New South Wales",
-      "longitudeOverride": 152.85846797845437
+      "longitudeOverride": 152.85846797845437,
+      "takenAtOverride": "2018-01-19T03:41:00.000Z"
     },
     "f09d11d98790f8367781": {
       "title": "Brolgas",
@@ -781,7 +810,8 @@
       ],
       "latitudeOverride": -20.001302270159798,
       "longitudeOverride": 148.24793002089618,
-      "displayLocationNameOverride": "X6XX+F5 Bowen, Queensland"
+      "displayLocationNameOverride": "X6XX+F5 Bowen, Queensland",
+      "takenAtOverride": "2017-01-12T03:41:00.000Z"
     },
     "14e8ef608c6f1783d5b0": {
       "title": "Loch Ness Monster",
@@ -791,7 +821,8 @@
       ],
       "displayLocationNameOverride": "Balchraggan, Inverness, UK",
       "latitudeOverride": 57.36436123024072,
-      "longitudeOverride": -4.393009114789184
+      "longitudeOverride": -4.393009114789184,
+      "takenAtOverride": "2024-11-15T05:41:00.000Z"
     },
     "e0722332a4c7fb98f12a": {
       "title": "Second Hand",
@@ -802,7 +833,8 @@
       ],
       "displayLocationNameOverride": "Alice Springs, Northern Territory",
       "latitudeOverride": -23.70515363402024,
-      "longitudeOverride": 133.8799971081275
+      "longitudeOverride": 133.8799971081275,
+      "takenAtOverride": "2018-09-27T18:41:00.000Z"
     },
     "17ddca29efc2f05e697d": {
       "title": "Koala Family",
@@ -812,7 +844,8 @@
       ],
       "displayLocationNameOverride": "Sancrox NSW 2446",
       "latitudeOverride": -31.459337143295482,
-      "longitudeOverride": 152.8199495215094
+      "longitudeOverride": 152.8199495215094,
+      "takenAtOverride": "2018-01-19T03:41:00.000Z"
     },
     "36697b2642bd7f45c5b7": {
       "title": "Crocodile",
@@ -822,7 +855,8 @@
       ],
       "longitudeOverride": 137.76547219627463,
       "latitudeOverride": -32.4922355527714,
-      "displayLocationNameOverride": "Port Augusta, South Australia"
+      "displayLocationNameOverride": "Port Augusta, South Australia",
+      "takenAtOverride": "2018-09-23T18:41:00.000Z"
     },
     "471adebaa51676ac9896": {
       "title": "Clown Fish",
@@ -832,7 +866,8 @@
       ],
       "displayLocationNameOverride": "Kalimna, Victoria",
       "longitudeOverride": 147.957423410004,
-      "latitudeOverride": -37.86942640669637
+      "latitudeOverride": -37.86942640669637,
+      "takenAtOverride": "2018-01-20T08:41:00.000Z"
     },
     "4f22d02e43ef63491a4c": {
       "title": "Miner",
@@ -842,7 +877,8 @@
       ],
       "displayLocationNameOverride": "Alice Springs, Northern Territory",
       "longitudeOverride": 133.87804006585537,
-      "latitudeOverride": -23.703600186005964
+      "latitudeOverride": -23.703600186005964,
+      "takenAtOverride": "2018-09-27T08:41:00.000Z"
     },
     "6116e3a196c7deeb17ba": {
       "title": "Goanna",
@@ -852,7 +888,8 @@
       ],
       "longitudeOverride": 134.75607290961221,
       "latitudeOverride": -29.008467641513207,
-      "displayLocationNameOverride": "Coober Pedy, SA"
+      "displayLocationNameOverride": "Coober Pedy, SA",
+      "takenAtOverride": "2018-09-24T08:41:00.000Z"
     },
     "7df37cf227f4d2c6b9b0": {
       "title": "Seeds",
@@ -862,7 +899,8 @@
       ],
       "displayLocationNameOverride": "Minyip, Victoria",
       "longitudeOverride": 142.5870502657591,
-      "latitudeOverride": -36.45984691330868
+      "latitudeOverride": -36.45984691330868,
+      "takenAtOverride": "2018-10-06T09:41:00.000Z"
     },
     "7273337387cd0c78bb4c": {
       "title": "Miner",
@@ -873,7 +911,8 @@
       ],
       "longitudeOverride": 143.9370779923611,
       "latitudeOverride": -37.563634408818565,
-      "displayLocationNameOverride": "Warrenheip, Victoria"
+      "displayLocationNameOverride": "Warrenheip, Victoria",
+      "takenAtOverride": "2018-09-22T18:41:00.000Z"
     },
     "fd60d5f139a37e37ebf9": {
       "title": "Oyster",
@@ -883,7 +922,8 @@
       ],
       "displayLocationNameOverride": "Taree, New South Wales",
       "longitudeOverride": 152.48828598509945,
-      "latitudeOverride": -31.89992266414195
+      "latitudeOverride": -31.89992266414195,
+      "takenAtOverride": "2017-12-27T03:41:00.000Z"
     },
     "d4241c06965106fb361a": {
       "title": "Knight",
@@ -894,7 +934,8 @@
       ],
       "displayLocationNameOverride": "Knockrow, New South Wales",
       "longitudeOverride": 153.53512977241604,
-      "latitudeOverride": -28.749570052557164
+      "latitudeOverride": -28.749570052557164,
+      "takenAtOverride": "2018-01-07T09:21:00.000Z"
     },
     "1e0916fcdfac87ff84bf": {
       "title": "Turtle",
@@ -904,7 +945,8 @@
       ],
       "latitudeOverride": -8.706488528066895,
       "longitudeOverride": 115.26038476058481,
-      "displayLocationNameOverride": "Sanur, Bali, Indonesia"
+      "displayLocationNameOverride": "Sanur, Bali, Indonesia",
+      "takenAtOverride": "2026-06-30T18:41:00.000Z"
     },
     "348fdfaafefbc3395771": {
       "title": "Lamp",
@@ -914,7 +956,8 @@
       ],
       "latitudeOverride": -8.706488528066895,
       "longitudeOverride": 115.26038476058481,
-      "displayLocationNameOverride": "Sanur, Bali, Indonesia"
+      "displayLocationNameOverride": "Sanur, Bali, Indonesia",
+      "takenAtOverride": "2026-06-30T04:41:00.000Z"
     },
     "690ec46f9de02793f640": {
       "title": "Squirrel",
@@ -924,7 +967,8 @@
       ],
       "latitudeOverride": -8.706488528066895,
       "longitudeOverride": 115.26038476058481,
-      "displayLocationNameOverride": "Sanur, Bali, Indonesia"
+      "displayLocationNameOverride": "Sanur, Bali, Indonesia",
+      "takenAtOverride": "2026-07-01T02:41:00.000Z"
     },
     "75bcf5db0b8fc67dbaab": {
       "title": "Brown Trout",
@@ -935,7 +979,8 @@
       ],
       "displayLocationNameOverride": "Gore, New Zealand",
       "longitudeOverride": 168.94756627022574,
-      "latitudeOverride": -46.09866233804181
+      "latitudeOverride": -46.09866233804181,
+      "takenAtOverride": "2023-01-13T06:41:00.000Z"
     },
     "7e95e833241a6e99eec9": {
       "title": "Bowl",
@@ -945,7 +990,8 @@
       ],
       "displayLocationNameOverride": "Proserpine, Queensland",
       "longitudeOverride": 148.59253357205068,
-      "latitudeOverride": -20.40533846414009
+      "latitudeOverride": -20.40533846414009,
+      "takenAtOverride": "2022-01-12T06:41:00.000Z"
     },
     "8014fdd603a789dd3e2b": {
       "title": "Ned Kelly",
@@ -956,7 +1002,8 @@
       ],
       "displayLocationNameOverride": "Glenrowan, Victoria",
       "longitudeOverride": 146.22120176622408,
-      "latitudeOverride": -36.4641230546689
+      "latitudeOverride": -36.4641230546689,
+      "takenAtOverride": "2017-12-26T06:41:00.000Z"
     },
     "8341ff97c66af9b34a96": {
       "title": "Rooster",
@@ -967,7 +1014,8 @@
       ],
       "displayLocationNameOverride": "Golden Square, Victoria",
       "longitudeOverride": 144.27020436802962,
-      "latitudeOverride": -36.78059848003463
+      "latitudeOverride": -36.78059848003463,
+      "takenAtOverride": "2024-10-05T07:41:00.000Z"
     },
     "8440d15b662255186c18": {
       "title": "Koala",
@@ -977,7 +1025,8 @@
       ],
       "displayLocationNameOverride": "Gundagai, New South Wales",
       "longitudeOverride": 148.11057375940467,
-      "latitudeOverride": -35.00247871709898
+      "latitudeOverride": -35.00247871709898,
+      "takenAtOverride": "2025-05-06T08:41:00.000Z"
     },
     "84673c1bf48083a8c63d": {
       "title": "Axe",
@@ -987,7 +1036,8 @@
       ],
       "displayLocationNameOverride": "Kew, New South Wales",
       "longitudeOverride": 152.72221665745323,
-      "latitudeOverride": -31.63526900820708
+      "latitudeOverride": -31.63526900820708,
+      "takenAtOverride": "2017-12-27T06:41:00.000Z"
     },
     "866a63e7829c80bf1a60": {
       "title": "Cigar",
@@ -997,7 +1047,8 @@
       ],
       "displayLocationNameOverride": "Churchill, Victoria",
       "longitudeOverride": 146.41973749566574,
-      "latitudeOverride": -38.31334980709082
+      "latitudeOverride": -38.31334980709082,
+      "takenAtOverride": "2018-01-20T06:41:00.000Z"
     },
     "87d0d60e358a89ed8a2d": {
       "title": "Koala",
@@ -1007,7 +1058,8 @@
       ],
       "displayLocationNameOverride": "Gundagai, New South Wales",
       "longitudeOverride": 148.1105965528047,
-      "latitudeOverride": -35.00248834090358
+      "latitudeOverride": -35.00248834090358,
+      "takenAtOverride": "2017-12-26T06:41:00.000Z"
     },
     "87719b391dd7e13142a5": {
       "title": "Lyrebird",
@@ -1017,7 +1069,8 @@
       ],
       "displayLocationNameOverride": "Cann River, Victoria",
       "longitudeOverride": 149.1531200610711,
-      "latitudeOverride": -37.56555548915762
+      "latitudeOverride": -37.56555548915762,
+      "takenAtOverride": "2025-11-20T08:41:00.000Z"
     },
     "8c4a8700f2db61f77d37": {
       "title": "Olives",
@@ -1027,7 +1080,8 @@
       ],
       "displayLocationNameOverride": "Tailem Bend, South Australia",
       "longitudeOverride": 139.46954065032727,
-      "latitudeOverride": -35.27547122954168
+      "latitudeOverride": -35.27547122954168,
+      "takenAtOverride": "2018-09-22T13:01:00.000Z"
     },
     "8ce9d67d26256164c6ef": {
       "title": "Golden Dog",
@@ -1038,7 +1092,8 @@
       ],
       "displayLocationNameOverride": "Glenreagh, New South Wales",
       "longitudeOverride": 152.97895721272843,
-      "latitudeOverride": -30.05083590279421
+      "latitudeOverride": -30.05083590279421,
+      "takenAtOverride": "2018-01-05T17:21:00.000Z"
     },
     "95bfedb41a301ed31c4b": {
       "title": "Shoe",
@@ -1048,7 +1103,8 @@
       ],
       "displayLocationNameOverride": "Dunedin, New Zealand",
       "longitudeOverride": 170.5103709313402,
-      "latitudeOverride": -45.90718176923605
+      "latitudeOverride": -45.90718176923605,
+      "takenAtOverride": "2023-01-12T06:41:00.000Z"
     },
     "957b87d69f4c104ce022": {
       "title": "Prawn",
@@ -1059,7 +1115,8 @@
       ],
       "displayLocationNameOverride": "West Ballina, New South Wales",
       "longitudeOverride": 153.53260219818327,
-      "latitudeOverride": -28.863835174562425
+      "latitudeOverride": -28.863835174562425,
+      "takenAtOverride": "2018-01-06T06:41:00.000Z"
     },
     "db0a7dddef34f54b51e8": {
       "title": "Rat",
@@ -1069,7 +1126,8 @@
       ],
       "displayLocationNameOverride": "Lower Light, South Australia",
       "latitudeOverride": -34.502604177067,
-      "longitudeOverride": 138.4048565518402
+      "longitudeOverride": 138.4048565518402,
+      "takenAtOverride": "2018-09-23T08:41:00.000Z"
     },
     "e45dda6fa417b197e660": {
       "title": "Cockroach",
@@ -1079,7 +1137,8 @@
       ],
       "longitudeOverride": 138.4048565518402,
       "latitudeOverride": -34.502604177067,
-      "displayLocationNameOverride": "Lower Light, South Australia"
+      "displayLocationNameOverride": "Lower Light, South Australia",
+      "takenAtOverride": "2018-09-23T04:41:00.000Z"
     },
     "9c7bebdf24f66f26ddb6": {
       "title": "Salmon",
@@ -1090,7 +1149,8 @@
       ],
       "displayLocationNameOverride": "United Kingdom",
       "longitudeOverride": -5.921700695053541,
-      "latitudeOverride": 54.601487816764575
+      "latitudeOverride": 54.601487816764575,
+      "takenAtOverride": "2024-11-15T06:41:00.000Z"
     },
     "990443e6c2bf720351e7": {
       "title": "Spider",
@@ -1100,7 +1160,8 @@
       ],
       "displayLocationNameOverride": "Vanier, Ottawa, ON, Canada",
       "longitudeOverride": -75.69731011852376,
-      "latitudeOverride": 45.42935712384222
+      "latitudeOverride": 45.42935712384222,
+      "takenAtOverride": "2026-02-18T17:41:00.000Z"
     },
     "9f7bf2272b5b044caeb4": {
       "title": "Sub",
@@ -1110,7 +1171,8 @@
       ],
       "latitudeOverride": -35.718366737803585,
       "displayLocationNameOverride": "Holbrook, New South Wales",
-      "longitudeOverride": 147.31718511578305
+      "longitudeOverride": 147.31718511578305,
+      "takenAtOverride": "2017-12-26T06:41:00.000Z"
     },
     "a3c49417b4c73f3b59bb": {
       "title": "Koala",
@@ -1121,7 +1183,8 @@
       ],
       "displayLocationNameOverride": "Dadswells Bridge, Victoria",
       "longitudeOverride": 142.51413849576923,
-      "latitudeOverride": -36.918120710116554
+      "latitudeOverride": -36.918120710116554,
+      "takenAtOverride": "2018-09-22T18:41:00.000Z"
     },
     "a5c7ded9b6a01aa72842": {
       "title": "Winch",
@@ -1131,7 +1194,8 @@
       ],
       "displayLocationNameOverride": "Coober Pedy, SA",
       "longitudeOverride": 134.75810825828185,
-      "latitudeOverride": -29.00874903787205
+      "latitudeOverride": -29.00874903787205,
+      "takenAtOverride": "2018-09-24T08:41:00.000Z"
     },
     "a746766af1281b8b2ff5": {
       "title": "Civet Cat",
@@ -1141,7 +1205,8 @@
       ],
       "displayLocationNameOverride": "Bali, Indonesia",
       "longitudeOverride": 115.2802996533185,
-      "latitudeOverride": -8.43994014318734
+      "latitudeOverride": -8.43994014318734,
+      "takenAtOverride": "2026-06-30T04:41:00.000Z"
     },
     "cc9804bba32b58289fbd": {
       "title": "Wheat",
@@ -1151,7 +1216,8 @@
       ],
       "displayLocationNameOverride": "Ouyen, Victoria",
       "longitudeOverride": 142.31890485429176,
-      "latitudeOverride": -35.072924457846774
+      "latitudeOverride": -35.072924457846774,
+      "takenAtOverride": "2018-10-06T13:41:00.000Z"
     },
     "f9f61e7dbd40c4cd7501": {
       "title": "Murray Cod",
@@ -1162,7 +1228,8 @@
       ],
       "displayLocationNameOverride": "Tocumwal, New South Wales",
       "longitudeOverride": 145.56398947072555,
-      "latitudeOverride": -35.81165507139711
+      "latitudeOverride": -35.81165507139711,
+      "takenAtOverride": "2023-04-09T10:41:00.000Z"
     },
     "c6f7f2390a09dd62d959": {
       "title": "John Dory",
@@ -1172,7 +1239,8 @@
       ],
       "displayLocationNameOverride": "Docklands, Victoria",
       "longitudeOverride": 144.95320621960673,
-      "latitudeOverride": -37.823158916639166
+      "latitudeOverride": -37.823158916639166,
+      "takenAtOverride": "2025-09-19T04:41:00.000Z"
     },
     "c4c84c13c23d0b0aa8be": {
       "title": "Scotsman",
@@ -1183,7 +1251,8 @@
       ],
       "displayLocationNameOverride": "Medindie, South Australia",
       "longitudeOverride": 138.603523011906,
-      "latitudeOverride": -34.893661524078546
+      "latitudeOverride": -34.893661524078546,
+      "takenAtOverride": "2018-09-22T08:41:00.000Z"
     },
     "c91835618d1434032304": {
       "title": "Motorcycle",
@@ -1193,7 +1262,8 @@
       ],
       "displayLocationNameOverride": "Nabiac, New South Wales",
       "longitudeOverride": 152.38331052298085,
-      "latitudeOverride": -32.09485804808902
+      "latitudeOverride": -32.09485804808902,
+      "takenAtOverride": "2018-01-18T19:41:00.000Z"
     },
     "bb9be7348a4e83d0a7b9": {
       "title": "Koala",
@@ -1204,7 +1274,8 @@
       ],
       "displayLocationNameOverride": "Dadswells Bridge, Victoria",
       "longitudeOverride": 142.5140779746006,
-      "latitudeOverride": -36.91815721345358
+      "latitudeOverride": -36.91815721345358,
+      "takenAtOverride": "2026-01-01T06:41:00.000Z"
     },
     "b617dcae717b95b94cd4": {
       "title": "Chook",
@@ -1215,7 +1286,8 @@
       ],
       "displayLocationNameOverride": "Mount Vernon, New South Wales",
       "longitudeOverride": 150.8066123268276,
-      "latitudeOverride": -33.877961483655504
+      "latitudeOverride": -33.877961483655504,
+      "takenAtOverride": "2017-12-27T09:41:00.000Z"
     },
     "b45d41359648597537bc": {
       "title": "Mallee Hen",
@@ -1226,7 +1298,8 @@
       ],
       "displayLocationNameOverride": "Patchewollock, Victoria",
       "longitudeOverride": 142.18955092426802,
-      "latitudeOverride": -35.383252964100315
+      "latitudeOverride": -35.383252964100315,
+      "takenAtOverride": "2018-10-06T07:41:00.000Z"
     },
     "aef7248dd70ab9af63c0": {
       "title": "Octopus",
@@ -1236,7 +1309,8 @@
       ],
       "displayLocationNameOverride": "Lakes Entrance, Victoria",
       "longitudeOverride": 147.97783308910735,
-      "latitudeOverride": -37.881884666683675
+      "latitudeOverride": -37.881884666683675,
+      "takenAtOverride": "2018-01-20T08:41:00.000Z"
     },
     "a8e8c2ef83785c9be5f7": {
       "title": "Lobster",
@@ -1246,7 +1320,8 @@
       ],
       "longitudeOverride": 115.26038476058481,
       "latitudeOverride": -8.706488528066895,
-      "displayLocationNameOverride": "Sanur, Bali, Indonesia"
+      "displayLocationNameOverride": "Sanur, Bali, Indonesia",
+      "takenAtOverride": "2026-06-30T04:41:00.000Z"
     },
     "ac8a9c418233e314e498": {
       "title": "Log",
@@ -1256,7 +1331,8 @@
       ],
       "displayLocationNameOverride": "Lismore, New South Wales",
       "longitudeOverride": 153.27448463009225,
-      "latitudeOverride": -28.813135663841777
+      "latitudeOverride": -28.813135663841777,
+      "takenAtOverride": "2018-01-07T06:41:00.000Z"
     },
     "d2fdd2bd3bc4b47b8e45": {
       "title": "Pharaoh",
@@ -1267,7 +1343,8 @@
       ],
       "displayLocationNameOverride": "Buronga, New South Wales",
       "longitudeOverride": 142.17903643332858,
-      "latitudeOverride": -34.17392197506498
+      "latitudeOverride": -34.17392197506498,
+      "takenAtOverride": "2018-10-05T07:41:00.000Z"
     },
     "ddb68fd833066927c60e": {
       "title": "Bird",
@@ -1277,7 +1354,8 @@
       ],
       "displayLocationNameOverride": "Rosedale, Victoria",
       "longitudeOverride": 146.78432789754433,
-      "latitudeOverride": -38.15613074547781
+      "latitudeOverride": -38.15613074547781,
+      "takenAtOverride": "2018-01-20T06:41:00.000Z"
     },
     "cb063deef68a86fdc8ac": {
       "title": "Lizard",
@@ -1287,7 +1365,8 @@
       ],
       "displayLocationNameOverride": "Somersby, New South Wales",
       "longitudeOverride": 151.27801103304796,
-      "latitudeOverride": -33.41848252918835
+      "latitudeOverride": -33.41848252918835,
+      "takenAtOverride": "2018-01-19T06:41:00.000Z"
     },
     "ec3637be611590dffb5b": {
       "title": "Bauble",
@@ -1297,7 +1376,8 @@
       ],
       "displayLocationNameOverride": "Bendigo, Victoria",
       "longitudeOverride": 144.28051548533486,
-      "latitudeOverride": -36.75987470655597
+      "latitudeOverride": -36.75987470655597,
+      "takenAtOverride": "2025-01-16T03:41:00.000Z"
     }
   }
 }

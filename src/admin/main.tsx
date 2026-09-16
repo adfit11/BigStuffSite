@@ -10,6 +10,7 @@ import type {
 } from "../shared/types";
 
 type AdminView = "incomplete" | "all" | "tags";
+type PhotoSortMode = "date" | "name";
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 const EMPTY_EDITORIAL_PHOTO: EditorialPhotoEntry = {
@@ -26,6 +27,7 @@ function AdminApp() {
   });
   const [selectedId, setSelectedId] = useState<PhotoId | null>(null);
   const [view, setView] = useState<AdminView>("incomplete");
+  const [sortMode, setSortMode] = useState<PhotoSortMode>("date");
   const [newTag, setNewTag] = useState("");
   const [dirty, setDirty] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("idle");
@@ -69,13 +71,26 @@ function AdminApp() {
 
   const selectedPhoto = photos.find((photo) => photo.id === selectedId) ?? null;
   const visiblePhotos = useMemo(() => {
+    const filteredPhotos =
+      view === "incomplete"
+        ? photos.filter((photo) => !isPublishable(photo, editorial.photos[photo.id]))
+        : photos;
+
+    const sortedPhotos = [...filteredPhotos];
+    sortedPhotos.sort((firstPhoto, secondPhoto) =>
+      comparePhotos(firstPhoto, secondPhoto, editorial, sortMode)
+    );
+
+    return sortedPhotos;
+  }, [editorial, photos, sortMode, view]);
+
+  const queueLabel = useMemo(() => {
     if (view === "incomplete") {
-      return photos.filter(
-        (photo) => !isPublishable(photo, editorial.photos[photo.id])
-      );
+      return `Incomplete photos (${visiblePhotos.length})`;
     }
-    return photos;
-  }, [editorial.photos, photos, view]);
+    return `All photos (${visiblePhotos.length})`;
+  }, [view, visiblePhotos.length]);
+
   const usageCounts = useMemo(() => getTagUsageCounts(editorial), [editorial]);
   const publishableCount = photos.filter((photo) =>
     isPublishable(photo, editorial.photos[photo.id])
@@ -224,7 +239,10 @@ function AdminApp() {
           <PhotoQueue
             photos={visiblePhotos}
             editorial={editorial}
+            label={queueLabel}
             selectedId={selectedId}
+            sortMode={sortMode}
+            onSortModeChange={setSortMode}
             onSelect={selectPhoto}
           />
           <PhotoEditor
@@ -246,42 +264,68 @@ function AdminApp() {
 function PhotoQueue({
   photos,
   editorial,
+  label,
   selectedId,
+  sortMode,
+  onSortModeChange,
   onSelect
 }: {
   photos: ImportedPhotoEntry[];
   editorial: EditorialData;
+  label: string;
   selectedId: PhotoId | null;
+  sortMode: PhotoSortMode;
+  onSortModeChange: (mode: PhotoSortMode) => void;
   onSelect: (id: PhotoId) => void;
 }) {
-  if (photos.length === 0) {
-    return <div className="queue-panel empty">No photos in this view.</div>;
-  }
-
   return (
     <div className="queue-panel">
-      {photos.map((photo) => {
-        const photoEditorial = editorial.photos[photo.id];
-        const title = photoEditorial?.title || photo.originalFilename;
-        const publishable = isPublishable(photo, photoEditorial);
-        return (
+      <div className="queue-toolbar">
+        <strong>{label}</strong>
+        <div className="sort-control" aria-label="Sort photo list">
           <button
-            className={`photo-row ${photo.id === selectedId ? "selected" : ""}`}
-            key={photo.id}
+            className={sortMode === "date" ? "active" : ""}
             type="button"
-            onClick={() => onSelect(photo.id)}
+            onClick={() => onSortModeChange("date")}
           >
-            <img src={photo.derivatives.thumb} alt="" />
-            <span>
-              <strong>{title}</strong>
-              <small>{formatDate(photoEditorial?.takenAtOverride ?? photo.takenAt)}</small>
-            </span>
-            <em className={publishable ? "status ready" : "status"}>
-              {publishable ? "Ready" : "Incomplete"}
-            </em>
+            Date
           </button>
-        );
-      })}
+          <button
+            className={sortMode === "name" ? "active" : ""}
+            type="button"
+            onClick={() => onSortModeChange("name")}
+          >
+            Name
+          </button>
+        </div>
+      </div>
+
+      {photos.length === 0 ? (
+        <div className="empty-queue">No photos in this view.</div>
+      ) : (
+        photos.map((photo) => {
+          const photoEditorial = editorial.photos[photo.id];
+          const title = getPhotoQueueTitle(photo, photoEditorial);
+          const publishable = isPublishable(photo, photoEditorial);
+          return (
+            <button
+              className={`photo-row ${photo.id === selectedId ? "selected" : ""}`}
+              key={photo.id}
+              type="button"
+              onClick={() => onSelect(photo.id)}
+            >
+              <img src={photo.derivatives.thumb} alt="" />
+              <span>
+                <strong>{title}</strong>
+                <small>{formatDate(getPhotoTakenAt(photo, photoEditorial))}</small>
+              </span>
+              <em className={publishable ? "status ready" : "status"}>
+                {publishable ? "Ready" : "Incomplete"}
+              </em>
+            </button>
+          );
+        })
+      )}
     </div>
   );
 }
@@ -497,6 +541,44 @@ function isPublishable(
       longitude != null &&
       locationName
   );
+}
+
+function comparePhotos(
+  firstPhoto: ImportedPhotoEntry,
+  secondPhoto: ImportedPhotoEntry,
+  editorial: EditorialData,
+  sortMode: PhotoSortMode
+): number {
+  const firstEditorial = editorial.photos[firstPhoto.id];
+  const secondEditorial = editorial.photos[secondPhoto.id];
+
+  if (sortMode === "name") {
+    const byTitle = getPhotoQueueTitle(firstPhoto, firstEditorial).localeCompare(
+      getPhotoQueueTitle(secondPhoto, secondEditorial),
+      undefined,
+      { sensitivity: "base" }
+    );
+    return byTitle === 0 ? firstPhoto.id.localeCompare(secondPhoto.id) : byTitle;
+  }
+
+  const firstDate = new Date(getPhotoTakenAt(firstPhoto, firstEditorial)).getTime();
+  const secondDate = new Date(getPhotoTakenAt(secondPhoto, secondEditorial)).getTime();
+  const byDate = firstDate - secondDate;
+  return byDate === 0 ? firstPhoto.id.localeCompare(secondPhoto.id) : byDate;
+}
+
+function getPhotoQueueTitle(
+  photo: ImportedPhotoEntry,
+  editorial: EditorialPhotoEntry | undefined
+): string {
+  return editorial?.title || photo.originalFilename;
+}
+
+function getPhotoTakenAt(
+  photo: ImportedPhotoEntry,
+  editorial: EditorialPhotoEntry | undefined
+): string {
+  return editorial?.takenAtOverride ?? photo.takenAt;
 }
 
 function getTagUsageCounts(editorial: EditorialData): Map<string, number> {

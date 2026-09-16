@@ -62,6 +62,7 @@ button:disabled {
 
 .save-button,
 .admin-tabs button,
+.sort-control button,
 .tag-form button,
 .tag-row button {
   padding: 8px 12px;
@@ -120,9 +121,52 @@ button:disabled {
   padding: 8px;
 }
 
-.queue-panel.empty {
+.queue-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 4px 10px;
+  background: #ffffff;
+}
+
+.queue-toolbar strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #404742;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sort-control {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #d4d8cf;
+  border-radius: 8px;
+  background: #f5f5f2;
+}
+
+.sort-control button {
+  padding: 6px 10px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.sort-control button.active {
+  color: #ffffff;
+  background: #24292f;
+  border-color: #24292f;
+}
+
+.empty-queue {
   display: grid;
   place-items: center;
+  min-height: 220px;
   color: #68706c;
 }
 
