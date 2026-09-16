@@ -1,6 +1,7 @@
 import express from "express";
 import { readFile, writeFile } from "node:fs/promises";
 import { createServer as createViteServer } from "vite";
+import { validateEditorialData } from "../src/shared/editorialValidation";
 import type { EditorialData, ImportedPhotoEntry } from "../src/shared/types";
 
 const app = express();
@@ -26,19 +27,11 @@ app.put("/api/editorial", async (request, response) => {
     await readFile(PHOTOS_PATH, "utf8")
   ) as ImportedPhotoEntry[];
   const validIds = new Set(importedPhotos.map((photo) => photo.id));
-  const validTags = new Set(editorial.tags);
 
-  for (const [photoId, photo] of Object.entries(editorial.photos)) {
-    if (!validIds.has(photoId)) {
-      response.status(400).json({ error: `Unknown photo ID: ${photoId}` });
-      return;
-    }
-
-    const unknownTag = photo.tags.find((tag) => !validTags.has(tag));
-    if (unknownTag) {
-      response.status(400).json({ error: `Unknown tag: ${unknownTag}` });
-      return;
-    }
+  const validation = validateEditorialData(editorial, validIds);
+  if (!validation.ok) {
+    response.status(400).json({ error: validation.error });
+    return;
   }
 
   await writeFile(EDITORIAL_PATH, `${JSON.stringify(editorial, null, 2)}\n`);

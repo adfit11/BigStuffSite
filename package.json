@@ -13,6 +13,7 @@
     "build:site": "vite build",
     "build": "npm run build:data && npm run build:site",
     "preview": "vite preview --host 127.0.0.1",
+    "test": "node --import tsx --test 'src/**/*.test.ts'",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
