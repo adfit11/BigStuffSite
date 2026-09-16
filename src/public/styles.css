@@ -24,7 +24,7 @@ button {
 
 .public-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 410px;
+  grid-template-columns: minmax(0, 1fr) clamp(560px, 44vw, 680px);
   height: 100vh;
   overflow: hidden;
 }
@@ -81,8 +81,9 @@ button {
 .tag-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px 10px;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
   border-bottom: 1px solid #d7d7d0;
 }
 
@@ -97,6 +98,21 @@ button {
   border-radius: 6px;
 }
 
+.tag-filters button {
+  padding: 3px 7px;
+  color: #53605b;
+  font-size: 12px;
+  font-weight: 700;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 999px;
+}
+
+.tag-filters button:hover {
+  color: #25302c;
+  background: #eef3ef;
+}
+
 .tag-filters button.active {
   color: #ffffff;
   background: #315e56;
@@ -109,8 +125,8 @@ button {
 
 .feature-panel {
   display: grid;
-  gap: 12px;
-  padding: 12px 14px 14px;
+  gap: 10px;
+  padding: 10px 14px 12px;
   border-bottom: 1px solid #d7d7d0;
 }
 
@@ -132,9 +148,9 @@ button {
 .feature-image-button img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  max-height: 34vh;
-  object-fit: contain;
+  aspect-ratio: 16 / 9;
+  max-height: 44vh;
+  object-fit: cover;
   border-radius: 8px;
 }
 
@@ -168,22 +184,29 @@ button {
   background: #ffffff;
 }
 
+.feature-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 230px);
+  align-items: end;
+  gap: 4px 14px;
+}
+
 .feature-copy h1 {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1.1;
   letter-spacing: 0;
 }
 
 .feature-copy p {
-  margin: 10px 0 0;
-  line-height: 1.5;
+  margin: 8px 0 0;
+  line-height: 1.35;
 }
 
 .eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   color: #5c6f68;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -197,7 +220,7 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .photo-tags span {
@@ -210,12 +233,13 @@ button {
 }
 
 .gps-link {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 8px 10px;
+  display: grid;
+  gap: 3px;
+  grid-column: 2;
+  grid-row: 1 / 5;
+  align-self: end;
+  margin-top: 0;
+  padding: 7px 9px;
   color: #25302c;
   font-weight: 700;
   text-decoration: none;
@@ -229,7 +253,6 @@ button {
 }
 
 .gps-link span {
-  flex: 0 0 auto;
   color: #53605b;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
@@ -238,7 +261,8 @@ button {
 
 .title-list {
   overflow: auto;
-  padding: 8px 10px 14px;
+  padding: 0 14px 14px;
+  border-top: 1px solid #ecefea;
   background:
     linear-gradient(#fbfbf8 30%, rgb(251 251 248 / 0)),
     linear-gradient(rgb(251 251 248 / 0), #fbfbf8 70%) bottom,
@@ -262,9 +286,11 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 2px 10px;
+  margin: 0 -14px 6px;
+  padding: 10px 14px;
   color: #53605b;
   background: #fbfbf8;
+  border-bottom: 1px solid #ecefea;
 }
 
 .title-list-header strong {
@@ -275,9 +301,10 @@ button {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 9px 10px;
+  min-height: 34px;
+  padding: 6px 8px;
   text-align: left;
   color: #4c514f;
   cursor: pointer;
@@ -295,13 +322,54 @@ button {
 
 .title-list button small {
   color: #6f7772;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .title-list button:hover,
 .title-list button.active {
   color: #17211d;
   background: #eef3ef;
+}
+
+@media (min-width: 1180px) {
+  .title-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: start;
+    column-gap: 8px;
+  }
+
+  .title-list-header {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1120px) {
+  .public-shell {
+    grid-template-columns: minmax(0, 1fr) 500px;
+  }
+
+  .feature-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-copy {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-image-button img {
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+  }
+
+  .gps-link {
+    display: flex;
+    grid-column: auto;
+    grid-row: auto;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
 }
 
 .photo-rail {
