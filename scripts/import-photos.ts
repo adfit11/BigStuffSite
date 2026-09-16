@@ -4,6 +4,7 @@ import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, join } from "node:path";
 import exifr from "exifr";
 import sharp from "sharp";
+import { mergeImportedPhotoEntries } from "../src/shared/importedPhotoCatalog";
 import type { ImportedPhotoEntry } from "../src/shared/types";
 
 const SOURCE_DIR = "source-photos";
@@ -29,6 +30,7 @@ async function main() {
   await ensureProjectDirectories();
 
   const files = await listSourceFiles(SOURCE_DIR);
+  const existingPhotos = await readJson<ImportedPhotoEntry[]>(DATA_PATH, []);
   if (files.length === 0) {
     console.log(`No photos found. Add JPEG, PNG, or WebP files to ${SOURCE_DIR}/.`);
     return;
@@ -36,7 +38,7 @@ async function main() {
 
   const geocodeCache = await readJson<GeocodeCache>(GEOCODE_CACHE_PATH, {});
   const seenHashes = new Set<string>();
-  const importedPhotos: ImportedPhotoEntry[] = [];
+  const incomingPhotos: ImportedPhotoEntry[] = [];
   const summary: ImportSummary = {
     imported: 0,
     duplicates: [],
@@ -74,7 +76,7 @@ async function main() {
 
     const derivatives = await createDerivatives(filePath, id);
 
-    importedPhotos.push({
+    incomingPhotos.push({
       id,
       originalFilename: basename(filePath),
       contentHash,
@@ -88,10 +90,7 @@ async function main() {
     summary.imported += 1;
   }
 
-  importedPhotos.sort((a, b) => {
-    const byDate = a.takenAt.localeCompare(b.takenAt);
-    return byDate === 0 ? a.id.localeCompare(b.id) : byDate;
-  });
+  const importedPhotos = mergeImportedPhotoEntries(existingPhotos, incomingPhotos);
 
   await writeJson(DATA_PATH, importedPhotos);
   await writeJson(GEOCODE_CACHE_PATH, geocodeCache);
