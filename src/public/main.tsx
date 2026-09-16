@@ -248,7 +248,7 @@ function PhotoMap({
       <div ref={elementRef} className="map-panel" />
       <header className="site-title">
         <h1>Big Stuff</h1>
-        <p>Australia’s oversized icons, one stop at a time</p>
+        <p>{photos.length} Big Things found. Millions to go.</p>
       </header>
     </section>
   );
