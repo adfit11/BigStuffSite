@@ -196,6 +196,12 @@ function PhotoMap({
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
+    map.createPane("featuredMarkers");
+    const featuredPane = map.getPane("featuredMarkers");
+    if (featuredPane) {
+      featuredPane.style.zIndex = "700";
+    }
+
     mapRef.current = map;
   }, []);
 
@@ -212,6 +218,7 @@ function PhotoMap({
     const spreadPhotos = applyMarkerSpread(photos);
     markersRef.current = spreadPhotos.map(({ photo, latitude, longitude }) => {
       const marker = L.marker([latitude, longitude], {
+        pane: photo.id === featuredPhoto?.id ? "featuredMarkers" : "markerPane",
         icon: L.divIcon({
           className: `photo-marker ${photo.id === featuredPhoto?.id ? "featured" : ""}`,
           html: `<img src="${assetUrl(photo.derivatives.thumb)}" alt="">`,
@@ -236,7 +243,15 @@ function PhotoMap({
     });
   }, [featuredPhoto]);
 
-  return <section ref={elementRef} className="map-panel" aria-label="Photo map" />;
+  return (
+    <section className="map-shell" aria-label="Photo map">
+      <div ref={elementRef} className="map-panel" />
+      <header className="site-title">
+        <h1>Big Stuff</h1>
+        <p>Australia’s oversized icons, one stop at a time</p>
+      </header>
+    </section>
+  );
 }
 
 function FeaturePanel({
@@ -252,9 +267,27 @@ function FeaturePanel({
 }) {
   return (
     <section className="feature-panel">
-      <button className="feature-image-button" type="button" onClick={onOpenLightbox}>
-        <img src={assetUrl(photo.derivatives.large)} alt={photo.title} />
-      </button>
+      <div className="feature-image-frame">
+        <button
+          className="feature-nav previous"
+          type="button"
+          aria-label="Previous photo"
+          onClick={onPrevious}
+        >
+          ‹
+        </button>
+        <button className="feature-image-button" type="button" onClick={onOpenLightbox}>
+          <img src={assetUrl(photo.derivatives.large)} alt={photo.title} />
+        </button>
+        <button
+          className="feature-nav next"
+          type="button"
+          aria-label="Next photo"
+          onClick={onNext}
+        >
+          ›
+        </button>
+      </div>
       <div className="feature-copy">
         <p className="eyebrow">{formatDate(photo.takenAt)}</p>
         <h1>{photo.title}</h1>
@@ -265,14 +298,17 @@ function FeaturePanel({
             <span key={tag}>{tag}</span>
           ))}
         </div>
-      </div>
-      <div className="feature-actions" aria-label="Photo navigation">
-        <button type="button" onClick={onPrevious}>
-          Previous
-        </button>
-        <button type="button" onClick={onNext}>
-          Next
-        </button>
+        <a
+          className="gps-link"
+          href={mapsUrl(photo)}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Open GPS coordinates
+          <span>
+            {formatCoordinate(photo.latitude)}, {formatCoordinate(photo.longitude)}
+          </span>
+        </a>
       </div>
     </section>
   );
@@ -327,6 +363,10 @@ function PhotoList({
 
   return (
     <nav className="title-list" aria-label="Chronological photo list">
+      <div className="title-list-header">
+        <strong>Photo list</strong>
+        <span>{photos.length} stops</span>
+      </div>
       {photos.map((photo) => (
         <button
           ref={photo.id === featuredId ? selectedRef : null}
@@ -335,7 +375,8 @@ function PhotoList({
           type="button"
           onClick={() => onFeature(photo.id)}
         >
-          {photo.title}
+          <span>{photo.title}</span>
+          <small>{formatDate(photo.takenAt)}</small>
         </button>
       ))}
     </nav>
@@ -394,6 +435,9 @@ function PhotoRail({
           <img src={assetUrl(photo.derivatives.large)} alt={photo.title} />
           <h2>{photo.title}</h2>
           <p>{photo.displayLocationName}</p>
+          <a href={mapsUrl(photo)} target="_blank" rel="noreferrer">
+            Open map
+          </a>
         </article>
       ))}
     </div>
@@ -464,6 +508,17 @@ function formatDate(value: string): string {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
     new Date(value)
   );
+}
+
+function mapsUrl(photo: PublicPhotoEntry): string {
+  const query = `${photo.latitude},${photo.longitude}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    query
+  )}`;
+}
+
+function formatCoordinate(value: number): string {
+  return value.toFixed(5);
 }
 
 createRoot(document.getElementById("root")!).render(
