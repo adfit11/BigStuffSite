@@ -13,6 +13,7 @@ type LoadState =
 function PublicApp() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [titleQuery, setTitleQuery] = useState("");
   const [featuredId, setFeaturedId] = useState<PhotoId | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -30,6 +31,7 @@ function PublicApp() {
 
         setLoadState({ status: "loaded", data });
         setSelectedTags(urlTags.filter((tag) => data.tags.includes(tag)));
+        setTitleQuery(params.get("q") ?? "");
         setFeaturedId(params.get("photo") ?? data.photos[0]?.id ?? null);
       } catch (error) {
         setLoadState({
@@ -48,10 +50,17 @@ function PublicApp() {
       return [];
     }
 
-    return data.photos.filter((photo) =>
-      selectedTags.every((tag) => photo.tags.includes(tag))
-    );
-  }, [data, selectedTags]);
+    const normalizedTitleQuery = titleQuery.trim().toLocaleLowerCase();
+
+    return data.photos.filter((photo) => {
+      const matchesTags = selectedTags.every((tag) => photo.tags.includes(tag));
+      const matchesTitle =
+        normalizedTitleQuery.length === 0 ||
+        photo.title.toLocaleLowerCase().includes(normalizedTitleQuery);
+
+      return matchesTags && matchesTitle;
+    });
+  }, [data, selectedTags, titleQuery]);
 
   const featuredPhoto =
     filteredPhotos.find((photo) => photo.id === featuredId) ??
@@ -76,10 +85,13 @@ function PublicApp() {
     if (selectedTags.length > 0) {
       params.set("tags", selectedTags.join(","));
     }
+    if (titleQuery.trim()) {
+      params.set("q", titleQuery.trim());
+    }
 
     const query = params.toString();
     window.history.replaceState(null, "", query ? `?${query}` : window.location.pathname);
-  }, [data, featuredPhoto, selectedTags]);
+  }, [data, featuredPhoto, selectedTags, titleQuery]);
 
   const featurePhoto = useCallback((photoId: PhotoId) => {
     setFeaturedId(photoId);
@@ -105,7 +117,7 @@ function PublicApp() {
   }
 
   if (loadState.status === "loading") {
-    return <main className="loading-shell">Loading photos...</main>;
+    return <LoadingGuide />;
   }
 
   if (loadState.status === "error") {
@@ -124,8 +136,10 @@ function PublicApp() {
         <TagFilters
           tags={loadState.data.tags}
           selectedTags={selectedTags}
+          titleQuery={titleQuery}
           onToggle={toggleTag}
           onClear={() => setSelectedTags([])}
+          onTitleQueryChange={setTitleQuery}
         />
 
         {featuredPhoto ? (
@@ -149,8 +163,14 @@ function PublicApp() {
           </>
         ) : (
           <section className="empty-state">
-            <h1>No photos match these tags.</h1>
-            <button type="button" onClick={() => setSelectedTags([])}>
+            <h1>No photos match these filters.</h1>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedTags([]);
+                setTitleQuery("");
+              }}
+            >
               Clear Filters
             </button>
           </section>
@@ -165,6 +185,40 @@ function PublicApp() {
           onNext={() => moveFeature(1)}
         />
       ) : null}
+    </main>
+  );
+}
+
+function LoadingGuide() {
+  return (
+    <main className="loading-shell" aria-live="polite" aria-label="Loading photos">
+      <div className="loading-guide">
+        <section className="loading-map-guide" aria-hidden="true">
+          <div className="loading-title-card">
+            <strong>Big Stuff</strong>
+            <span>Loading the map...</span>
+          </div>
+          <div className="guide-callout map-callout">Select from the map</div>
+        </section>
+        <section className="loading-panel-guide" aria-hidden="true">
+          <div className="guide-filter-row" />
+          <div className="guide-image-window">
+            <div className="guide-callout image-callout">Click for more info</div>
+          </div>
+          <div className="guide-meta-row">
+            <span />
+            <span />
+            <div className="guide-callout coordinates-callout">Visit the location</div>
+          </div>
+          <div className="guide-list">
+            <div className="guide-callout list-callout">Scroll the list</div>
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
@@ -332,15 +386,27 @@ function FeaturePanel({
 function TagFilters({
   tags,
   selectedTags,
+  titleQuery,
   onToggle,
-  onClear
+  onClear,
+  onTitleQueryChange
 }: {
   tags: string[];
   selectedTags: string[];
+  titleQuery: string;
   onToggle: (tag: string) => void;
   onClear: () => void;
+  onTitleQueryChange: (query: string) => void;
 }) {
   const visibleTags = tags.filter((tag) => !HIDDEN_FILTER_TAGS.has(tag));
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (isSearchOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isSearchOpen]);
 
   return (
     <section className="tag-filters" aria-label="Tag filters">
@@ -359,6 +425,45 @@ function TagFilters({
           Clear
         </button>
       ) : null}
+      <button
+        className={titleQuery ? "title-search-toggle active" : "title-search-toggle"}
+        type="button"
+        aria-expanded={isSearchOpen}
+        aria-label="Filter by title"
+        title="Filter by title"
+        onClick={() => setIsSearchOpen((current) => !current)}
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M16.5 16.5 21 21" />
+        </svg>
+      </button>
+      {isSearchOpen ? (
+        <div className="title-search-popover">
+          <input
+            ref={inputRef}
+            type="search"
+            value={titleQuery}
+            placeholder="Filter by title"
+            aria-label="Filter by title"
+            onChange={(event) => onTitleQueryChange(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setIsSearchOpen(false);
+              }
+            }}
+          />
+          {titleQuery ? (
+            <button
+              type="button"
+              aria-label="Clear title filter"
+              onClick={() => onTitleQueryChange("")}
+            >
+              Clear
+            </button>
+          ) : null}
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -366,7 +471,7 @@ function TagFilters({
 const HIDDEN_FILTER_TAGS = new Set(["big things", "biggish things"]);
 
 function formatFilterTag(tag: string): string {
-  return tag === "classics" ? "Classics Only" : tag;
+  return tag === "classics" ? "Show Classic Big Things Only" : tag;
 }
 
 function PhotoList({
