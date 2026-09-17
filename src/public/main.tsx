@@ -27,6 +27,7 @@ type PhotoMapItem =
 
 const CLUSTER_RADIUS_KM = 5;
 const CLUSTER_DISABLE_ZOOM = 13;
+const MIN_LOADING_GUIDE_MS = 1800;
 
 function PublicApp() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
@@ -37,8 +38,10 @@ function PublicApp() {
 
   useEffect(() => {
     async function loadData() {
+      const loadingStartedAt = Date.now();
       try {
         const response = await fetch(assetUrl("public-data.json"));
+        await delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS);
         if (!response.ok) {
           throw new Error("Could not load public photo data.");
         }
@@ -52,6 +55,7 @@ function PublicApp() {
         setTitleQuery(params.get("q") ?? "");
         setFeaturedId(params.get("photo") ?? data.photos[0]?.id ?? null);
       } catch (error) {
+        await delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS);
         setLoadState({
           status: "error",
           message: error instanceof Error ? error.message : "Could not load photos."
@@ -826,6 +830,12 @@ function distanceInKilometers(
 
 function toRadians(value: number): number {
   return (value * Math.PI) / 180;
+}
+
+function delayRemaining(startedAt: number, minimumMilliseconds: number): Promise<void> {
+  const elapsed = Date.now() - startedAt;
+  const remaining = Math.max(0, minimumMilliseconds - elapsed);
+  return new Promise((resolve) => window.setTimeout(resolve, remaining));
 }
 
 function assetUrl(path: string): string {
