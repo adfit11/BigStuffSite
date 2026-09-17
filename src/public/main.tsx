@@ -340,16 +340,18 @@ function TagFilters({
   onToggle: (tag: string) => void;
   onClear: () => void;
 }) {
+  const visibleTags = tags.filter((tag) => !HIDDEN_FILTER_TAGS.has(tag));
+
   return (
     <section className="tag-filters" aria-label="Tag filters">
-      {tags.map((tag) => (
+      {visibleTags.map((tag) => (
         <button
           className={selectedTags.includes(tag) ? "active" : ""}
           key={tag}
           type="button"
           onClick={() => onToggle(tag)}
         >
-          {tag}
+          {formatFilterTag(tag)}
         </button>
       ))}
       {selectedTags.length > 0 ? (
@@ -359,6 +361,12 @@ function TagFilters({
       ) : null}
     </section>
   );
+}
+
+const HIDDEN_FILTER_TAGS = new Set(["big things", "biggish things"]);
+
+function formatFilterTag(tag: string): string {
+  return tag === "classics" ? "Classics Only" : tag;
 }
 
 function PhotoList({
