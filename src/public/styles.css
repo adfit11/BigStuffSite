@@ -612,6 +612,38 @@ button {
   object-fit: cover;
 }
 
+.photo-cluster-marker {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  color: #ffffff;
+  font-weight: 850;
+  background: #315e56;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4px rgb(49 94 86 / 28%),
+    0 5px 18px rgb(0 0 0 / 28%);
+}
+
+.photo-cluster-marker.featured {
+  background: #25302c;
+  border-color: #ffcf3f;
+  box-shadow:
+    0 0 0 5px rgb(255 207 63 / 45%),
+    0 5px 18px rgb(0 0 0 / 30%);
+}
+
+.photo-cluster-marker span {
+  display: grid;
+  min-width: 26px;
+  height: 26px;
+  place-items: center;
+  font-size: 15px;
+  line-height: 1;
+}
+
 .lightbox {
   position: fixed;
   inset: 0;

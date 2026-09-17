@@ -9,6 +9,24 @@ type LoadState =
   | { status: "loading" }
   | { status: "loaded"; data: PublicData }
   | { status: "error"; message: string };
+type PhotoMapItem =
+  | {
+      type: "photo";
+      key: PhotoId;
+      photos: [PublicPhotoEntry];
+      latitude: number;
+      longitude: number;
+    }
+  | {
+      type: "cluster";
+      key: string;
+      photos: PublicPhotoEntry[];
+      latitude: number;
+      longitude: number;
+    };
+
+const CLUSTER_RADIUS_KM = 5;
+const CLUSTER_DISABLE_ZOOM = 13;
 
 function PublicApp() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
@@ -236,7 +254,8 @@ function PhotoMap({
 }) {
   const elementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<Map<PhotoId, L.Marker>>(new Map());
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const [mapZoom, setMapZoom] = useState(2);
 
   useEffect(() => {
     if (!elementRef.current || mapRef.current) {
@@ -254,6 +273,17 @@ function PhotoMap({
     }).addTo(map);
 
     mapRef.current = map;
+    setMapZoom(map.getZoom());
+
+    function syncZoom() {
+      setMapZoom(map.getZoom());
+    }
+
+    map.on("zoomend", syncZoom);
+
+    return () => {
+      map.off("zoomend", syncZoom);
+    };
   }, []);
 
   useEffect(() => {
@@ -262,40 +292,48 @@ function PhotoMap({
       return;
     }
 
-    const nextIds = new Set(photos.map((photo) => photo.id));
-    for (const [photoId, marker] of markersRef.current) {
-      if (!nextIds.has(photoId)) {
+    const mapItems = buildPhotoMapItems(photos, mapZoom);
+    const nextKeys = new Set(mapItems.map((item) => item.key));
+    for (const [itemKey, marker] of markersRef.current) {
+      if (!nextKeys.has(itemKey)) {
         marker.remove();
-        markersRef.current.delete(photoId);
+        markersRef.current.delete(itemKey);
       }
     }
 
-    const spreadPhotos = applyMarkerSpread(photos);
-    for (const { photo, latitude, longitude } of spreadPhotos) {
-      const existingMarker = markersRef.current.get(photo.id);
+    for (const item of mapItems) {
+      const existingMarker = markersRef.current.get(item.key);
       if (existingMarker) {
-        existingMarker.setLatLng([latitude, longitude]);
+        existingMarker.setLatLng([item.latitude, item.longitude]);
         continue;
       }
 
-      const marker = L.marker([latitude, longitude], {
-        icon: L.divIcon({
-          className: "photo-marker",
-          html: `<img src="${assetUrl(photo.derivatives.marker)}" alt="" loading="eager" decoding="async">`,
-          iconSize: [46, 46],
-          iconAnchor: [23, 23]
-        }),
+      const marker = L.marker([item.latitude, item.longitude], {
+        icon: createPhotoMapIcon(item),
         keyboard: false
       });
-      marker.on("click", () => onFeature(photo.id));
+      marker.on("click", () => {
+        if (item.type === "photo") {
+          onFeature(item.photos[0].id);
+          return;
+        }
+
+        const bounds = L.latLngBounds(
+          item.photos.map((photo) => [photo.latitude, photo.longitude])
+        );
+        map.fitBounds(bounds.pad(0.35), {
+          maxZoom: CLUSTER_DISABLE_ZOOM,
+          duration: 0.45
+        });
+      });
       marker.addTo(map);
-      markersRef.current.set(photo.id, marker);
+      markersRef.current.set(item.key, marker);
     }
-  }, [onFeature, photos]);
+  }, [mapZoom, onFeature, photos]);
 
   useEffect(() => {
-    for (const [photoId, marker] of markersRef.current) {
-      const isFeatured = photoId === featuredPhoto?.id;
+    for (const [itemKey, marker] of markersRef.current) {
+      const isFeatured = itemKeyContainsPhoto(itemKey, featuredPhoto?.id ?? null);
       marker.setZIndexOffset(isFeatured ? 1000 : 0);
       marker.getElement()?.classList.toggle("featured", isFeatured);
     }
@@ -307,9 +345,13 @@ function PhotoMap({
       return;
     }
 
-    map.flyTo([featuredPhoto.latitude, featuredPhoto.longitude], Math.max(map.getZoom(), 5), {
-      duration: 0.7
-    });
+    map.flyTo(
+      [featuredPhoto.latitude, featuredPhoto.longitude],
+      Math.max(map.getZoom(), CLUSTER_DISABLE_ZOOM),
+      {
+        duration: 0.7
+      }
+    );
   }, [featuredPhoto]);
 
   return (
@@ -626,6 +668,111 @@ function Lightbox({
   );
 }
 
+function createPhotoMapIcon(item: PhotoMapItem): L.DivIcon {
+  if (item.type === "cluster") {
+    return L.divIcon({
+      className: "photo-cluster-marker",
+      html: `<span>${item.photos.length}</span>`,
+      iconSize: [50, 50],
+      iconAnchor: [25, 25]
+    });
+  }
+
+  const photo = item.photos[0];
+  return L.divIcon({
+    className: "photo-marker",
+    html: `<img src="${assetUrl(photo.derivatives.marker)}" alt="" loading="eager" decoding="async">`,
+    iconSize: [46, 46],
+    iconAnchor: [23, 23]
+  });
+}
+
+function itemKeyContainsPhoto(itemKey: string, photoId: PhotoId | null): boolean {
+  if (!photoId) {
+    return false;
+  }
+
+  if (itemKey === photoId) {
+    return true;
+  }
+
+  return (
+    itemKey.startsWith("cluster:") &&
+    itemKey.slice("cluster:".length).split("|").includes(photoId)
+  );
+}
+
+function buildPhotoMapItems(photos: PublicPhotoEntry[], zoom: number): PhotoMapItem[] {
+  if (zoom >= CLUSTER_DISABLE_ZOOM) {
+    return applyMarkerSpread(photos).map(({ photo, latitude, longitude }) => ({
+      type: "photo",
+      key: photo.id,
+      photos: [photo],
+      latitude,
+      longitude
+    }));
+  }
+
+  const clusters: Array<{
+    photos: PublicPhotoEntry[];
+    latitude: number;
+    longitude: number;
+  }> = [];
+
+  for (const photo of photos) {
+    const cluster = clusters.find(
+      (candidate) =>
+        distanceInKilometers(
+          photo.latitude,
+          photo.longitude,
+          candidate.latitude,
+          candidate.longitude
+        ) <= CLUSTER_RADIUS_KM
+    );
+
+    if (!cluster) {
+      clusters.push({
+        photos: [photo],
+        latitude: photo.latitude,
+        longitude: photo.longitude
+      });
+      continue;
+    }
+
+    cluster.photos.push(photo);
+    cluster.latitude = average(cluster.photos.map((clusterPhoto) => clusterPhoto.latitude));
+    cluster.longitude = average(
+      cluster.photos.map((clusterPhoto) => clusterPhoto.longitude)
+    );
+  }
+
+  const mapItems: PhotoMapItem[] = [];
+  for (const cluster of clusters) {
+    if (cluster.photos.length === 1) {
+      const photo = cluster.photos[0];
+      mapItems.push({
+        type: "photo",
+        key: photo.id,
+        photos: [photo],
+        latitude: photo.latitude,
+        longitude: photo.longitude
+      });
+      continue;
+    }
+
+    const ids = cluster.photos.map((photo) => photo.id).sort();
+    mapItems.push({
+      type: "cluster",
+      key: `cluster:${ids.join("|")}`,
+      photos: cluster.photos,
+      latitude: cluster.latitude,
+      longitude: cluster.longitude
+    });
+  }
+
+  return mapItems;
+}
+
 function applyMarkerSpread(photos: PublicPhotoEntry[]) {
   const groups = new Map<string, PublicPhotoEntry[]>();
   for (const photo of photos) {
@@ -649,6 +796,36 @@ function applyMarkerSpread(photos: PublicPhotoEntry[]) {
       longitude: photo.longitude + Math.cos(angle) * distance
     };
   });
+}
+
+function average(values: number[]): number {
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function distanceInKilometers(
+  latitudeA: number,
+  longitudeA: number,
+  latitudeB: number,
+  longitudeB: number
+): number {
+  const earthRadiusKm = 6371;
+  const latitudeDelta = toRadians(latitudeB - latitudeA);
+  const longitudeDelta = toRadians(longitudeB - longitudeA);
+  const originLatitude = toRadians(latitudeA);
+  const destinationLatitude = toRadians(latitudeB);
+  const haversine =
+    Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(originLatitude) *
+      Math.cos(destinationLatitude) *
+      Math.sin(longitudeDelta / 2) ** 2;
+
+  return (
+    2 * earthRadiusKm * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine))
+  );
+}
+
+function toRadians(value: number): number {
+  return (value * Math.PI) / 180;
 }
 
 function assetUrl(path: string): string {
