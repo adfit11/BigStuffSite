@@ -27,7 +27,7 @@ type PhotoMapItem =
 
 const CLUSTER_RADIUS_KM = 5;
 const CLUSTER_DISABLE_ZOOM = 13;
-const MIN_LOADING_GUIDE_MS = 1800;
+const MIN_LOADING_GUIDE_MS = 3000;
 
 function PublicApp() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
@@ -39,9 +39,13 @@ function PublicApp() {
   useEffect(() => {
     async function loadData() {
       const loadingStartedAt = Date.now();
+      const userInteraction = waitForUserInteraction();
       try {
         const response = await fetch(assetUrl("public-data.json"));
-        await delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS);
+        await Promise.all([
+          delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS),
+          userInteraction
+        ]);
         if (!response.ok) {
           throw new Error("Could not load public photo data.");
         }
@@ -55,7 +59,10 @@ function PublicApp() {
         setTitleQuery(params.get("q") ?? "");
         setFeaturedId(params.get("photo") ?? data.photos[0]?.id ?? null);
       } catch (error) {
-        await delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS);
+        await Promise.all([
+          delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS),
+          userInteraction
+        ]);
         setLoadState({
           status: "error",
           message: error instanceof Error ? error.message : "Could not load photos."
@@ -218,7 +225,7 @@ function LoadingGuide() {
         <section className="loading-map-guide" aria-hidden="true">
           <div className="loading-title-card">
             <strong>Big Stuff</strong>
-            <span>Loading the map...</span>
+            <span>Tap or scroll to start</span>
           </div>
           <div className="guide-callout map-callout">Select from the map</div>
         </section>
@@ -836,6 +843,23 @@ function delayRemaining(startedAt: number, minimumMilliseconds: number): Promise
   const elapsed = Date.now() - startedAt;
   const remaining = Math.max(0, minimumMilliseconds - elapsed);
   return new Promise((resolve) => window.setTimeout(resolve, remaining));
+}
+
+function waitForUserInteraction(): Promise<void> {
+  return new Promise((resolve) => {
+    const events = ["pointerdown", "keydown", "wheel", "touchstart"];
+
+    function resolveOnce() {
+      for (const event of events) {
+        window.removeEventListener(event, resolveOnce);
+      }
+      resolve();
+    }
+
+    for (const event of events) {
+      window.addEventListener(event, resolveOnce, { once: true });
+    }
+  });
 }
 
 function assetUrl(path: string): string {
