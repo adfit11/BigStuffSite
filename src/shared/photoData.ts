@@ -13,6 +13,10 @@ export function getPublishablePhotos(
 
   for (const photo of importedPhotos) {
     const editorial = editorialData.photos[photo.id];
+    if (editorial?.omitted) {
+      continue;
+    }
+
     if (!editorial?.title || editorial.tags.length === 0) {
       continue;
     }

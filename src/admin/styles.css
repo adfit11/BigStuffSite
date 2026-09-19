@@ -225,6 +225,11 @@ button:disabled {
   background: #dff4e6;
 }
 
+.status.omitted {
+  color: #4f5965;
+  background: #e8edf2;
+}
+
 .editor-panel {
   overflow: auto;
   padding: 16px;
@@ -336,6 +341,20 @@ legend {
 }
 
 .tag-option input {
+  width: auto;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #d8d9d0;
+  border-radius: 6px;
+  background: #f5f5f2;
+}
+
+.checkbox-field input {
   width: auto;
 }
 

@@ -9,7 +9,7 @@ import type {
   PhotoId
 } from "../shared/types";
 
-type AdminView = "incomplete" | "all" | "tags";
+type AdminView = "incomplete" | "omitted" | "all" | "tags";
 type PhotoSortMode = "date" | "name";
 type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -44,8 +44,8 @@ function AdminApp() {
         const loadedEditorial = (await editorialResponse.json()) as EditorialData;
         setPhotos(loadedPhotos);
         setEditorial(loadedEditorial);
-        const firstIncomplete = loadedPhotos.find(
-          (photo) => !isPublishable(photo, loadedEditorial.photos[photo.id])
+        const firstIncomplete = loadedPhotos.find((photo) =>
+          isIncomplete(photo, loadedEditorial.photos[photo.id])
         );
         setSelectedId(firstIncomplete?.id ?? loadedPhotos[0]?.id ?? null);
       } catch (loadError) {
@@ -73,8 +73,10 @@ function AdminApp() {
   const visiblePhotos = useMemo(() => {
     const filteredPhotos =
       view === "incomplete"
-        ? photos.filter((photo) => !isPublishable(photo, editorial.photos[photo.id]))
-        : photos;
+        ? photos.filter((photo) => isIncomplete(photo, editorial.photos[photo.id]))
+        : view === "omitted"
+          ? photos.filter((photo) => isOmitted(editorial.photos[photo.id]))
+          : photos;
 
     const sortedPhotos = [...filteredPhotos];
     sortedPhotos.sort((firstPhoto, secondPhoto) =>
@@ -88,12 +90,21 @@ function AdminApp() {
     if (view === "incomplete") {
       return `Incomplete photos (${visiblePhotos.length})`;
     }
+    if (view === "omitted") {
+      return `Omitted photos (${visiblePhotos.length})`;
+    }
     return `All photos (${visiblePhotos.length})`;
   }, [view, visiblePhotos.length]);
 
   const usageCounts = useMemo(() => getTagUsageCounts(editorial), [editorial]);
   const publishableCount = photos.filter((photo) =>
     isPublishable(photo, editorial.photos[photo.id])
+  ).length;
+  const omittedCount = photos.filter((photo) =>
+    isOmitted(editorial.photos[photo.id])
+  ).length;
+  const incompleteCount = photos.filter((photo) =>
+    isIncomplete(photo, editorial.photos[photo.id])
   ).length;
 
   function updatePhoto(id: PhotoId, updates: Partial<EditorialPhotoEntry>) {
@@ -182,7 +193,7 @@ function AdminApp() {
           <h1>Photo metadata editor</h1>
           <p className="summary">
             {photos.length} imported photos, {publishableCount} publishable,{" "}
-            {photos.length - publishableCount} incomplete.
+            {omittedCount} omitted, {incompleteCount} incomplete.
           </p>
         </div>
         <button
@@ -208,6 +219,13 @@ function AdminApp() {
           onClick={() => setView("incomplete")}
         >
           Incomplete
+        </button>
+        <button
+          className={view === "omitted" ? "active" : ""}
+          type="button"
+          onClick={() => setView("omitted")}
+        >
+          Omitted
         </button>
         <button
           className={view === "all" ? "active" : ""}
@@ -307,6 +325,7 @@ function PhotoQueue({
           const photoEditorial = editorial.photos[photo.id];
           const title = getPhotoQueueTitle(photo, photoEditorial);
           const publishable = isPublishable(photo, photoEditorial);
+          const omitted = isOmitted(photoEditorial);
           return (
             <button
               className={`photo-row ${photo.id === selectedId ? "selected" : ""}`}
@@ -319,8 +338,12 @@ function PhotoQueue({
                 <strong>{title}</strong>
                 <small>{formatDate(getPhotoTakenAt(photo, photoEditorial))}</small>
               </span>
-              <em className={publishable ? "status ready" : "status"}>
-                {publishable ? "Ready" : "Incomplete"}
+              <em
+                className={
+                  omitted ? "status omitted" : publishable ? "status ready" : "status"
+                }
+              >
+                {omitted ? "Omitted" : publishable ? "Ready" : "Incomplete"}
               </em>
             </button>
           );
@@ -370,6 +393,15 @@ function PhotoEditor({
           <dd>{photo.takenAtSource}</dd>
         </div>
       </dl>
+
+      <label className="checkbox-field">
+        <input
+          type="checkbox"
+          checked={draft.omitted ?? false}
+          onChange={(event) => onChange({ omitted: event.target.checked })}
+        />
+        Omit from public site and unfinished queue
+      </label>
 
       <label>
         Title
@@ -529,6 +561,10 @@ function isPublishable(
   photo: ImportedPhotoEntry,
   editorial: EditorialPhotoEntry | undefined
 ): boolean {
+  if (isOmitted(editorial)) {
+    return false;
+  }
+
   const latitude = editorial?.latitudeOverride ?? photo.latitude;
   const longitude = editorial?.longitudeOverride ?? photo.longitude;
   const locationName =
@@ -541,6 +577,17 @@ function isPublishable(
       longitude != null &&
       locationName
   );
+}
+
+function isIncomplete(
+  photo: ImportedPhotoEntry,
+  editorial: EditorialPhotoEntry | undefined
+): boolean {
+  return !isOmitted(editorial) && !isPublishable(photo, editorial);
+}
+
+function isOmitted(editorial: EditorialPhotoEntry | undefined): boolean {
+  return editorial?.omitted === true;
 }
 
 function comparePhotos(

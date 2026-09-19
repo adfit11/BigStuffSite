@@ -25,6 +25,7 @@ export type ImportedPhotoEntry = {
 export type EditorialPhotoEntry = {
   title: string;
   description?: string;
+  omitted?: boolean;
   takenAtOverride?: string;
   latitudeOverride?: number;
   longitudeOverride?: number;
