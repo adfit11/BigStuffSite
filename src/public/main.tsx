@@ -28,6 +28,7 @@ type PhotoMapItem =
 const CLUSTER_RADIUS_KM = 5;
 const CLUSTER_DISABLE_ZOOM = 13;
 const MIN_LOADING_GUIDE_MS = 3000;
+const MAX_LOADING_GUIDE_MS = 5000;
 
 function PublicApp() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
@@ -39,7 +40,7 @@ function PublicApp() {
   useEffect(() => {
     async function loadData() {
       const loadingStartedAt = Date.now();
-      const userInteraction = waitForUserInteraction();
+      const userInteraction = waitForUserInteraction(MAX_LOADING_GUIDE_MS);
       try {
         const response = await fetch(assetUrl("public-data.json"));
         await Promise.all([
@@ -845,11 +846,13 @@ function delayRemaining(startedAt: number, minimumMilliseconds: number): Promise
   return new Promise((resolve) => window.setTimeout(resolve, remaining));
 }
 
-function waitForUserInteraction(): Promise<void> {
+function waitForUserInteraction(timeoutMilliseconds: number): Promise<void> {
   return new Promise((resolve) => {
     const events = ["pointerdown", "keydown", "wheel", "touchstart"];
+    const timeout = window.setTimeout(resolveOnce, timeoutMilliseconds);
 
     function resolveOnce() {
+      window.clearTimeout(timeout);
       for (const event of events) {
         window.removeEventListener(event, resolveOnce);
       }
