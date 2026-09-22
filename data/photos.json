@@ -2367,5 +2367,20 @@
       "large": "/photos/large/bef448b0a641008b2190.webp",
       "marker": "/photos/markers/bef448b0a641008b2190.webp"
     }
+  },
+  {
+    "id": "cf94f0158ea648d7a2b8",
+    "originalFilename": "IMG_2283.jpg",
+    "contentHash": "cf94f0158ea648d7a2b8ef4171b4443f902ce125bfdf1e58e0b9b3cbeb807d32",
+    "takenAt": "2026-09-22T02:16:17.000Z",
+    "takenAtSource": "exif",
+    "latitude": -15.487580555555555,
+    "longitude": 128.12393055555557,
+    "detectedLocationName": "Wyndham, Western Australia, Australia",
+    "derivatives": {
+      "thumb": "/photos/thumbs/cf94f0158ea648d7a2b8.webp",
+      "large": "/photos/large/cf94f0158ea648d7a2b8.webp",
+      "marker": "/photos/markers/cf94f0158ea648d7a2b8.webp"
+    }
   }
 ]
