@@ -2339,6 +2339,36 @@
     }
   },
   {
+    "id": "a52b927a2ef2dd2f2a0b",
+    "originalFilename": "IMG_2239.jpg",
+    "contentHash": "a52b927a2ef2dd2f2a0b946497e3516baef8950e80175f82413a15e36c3ff518",
+    "takenAt": "2026-09-17T01:31:47.000Z",
+    "takenAtSource": "exif",
+    "latitude": -16.25399722222222,
+    "longitude": 133.36946111111112,
+    "detectedLocationName": "Daly Waters, Australia",
+    "derivatives": {
+      "thumb": "/photos/thumbs/a52b927a2ef2dd2f2a0b.webp",
+      "large": "/photos/large/a52b927a2ef2dd2f2a0b.webp",
+      "marker": "/photos/markers/a52b927a2ef2dd2f2a0b.webp"
+    }
+  },
+  {
+    "id": "2145b9af622d89a423e1",
+    "originalFilename": "IMG_2241.jpg",
+    "contentHash": "2145b9af622d89a423e147d7eab2ef6db0d66712e3a59544fb02cdbed6688430",
+    "takenAt": "2026-09-17T02:39:18.000Z",
+    "takenAtSource": "exif",
+    "latitude": -16.253491666666665,
+    "longitude": 133.369475,
+    "detectedLocationName": "Daly Waters, Australia",
+    "derivatives": {
+      "thumb": "/photos/thumbs/2145b9af622d89a423e1.webp",
+      "large": "/photos/large/2145b9af622d89a423e1.webp",
+      "marker": "/photos/markers/2145b9af622d89a423e1.webp"
+    }
+  },
+  {
     "id": "cadf271d0a000d506549",
     "originalFilename": "IMG_2246.jpg",
     "contentHash": "cadf271d0a000d506549bedafb3003aaf8cdc4198bf6e74b5604a548b8efd28d",
@@ -2381,6 +2411,21 @@
       "thumb": "/photos/thumbs/cf94f0158ea648d7a2b8.webp",
       "large": "/photos/large/cf94f0158ea648d7a2b8.webp",
       "marker": "/photos/markers/cf94f0158ea648d7a2b8.webp"
+    }
+  },
+  {
+    "id": "280c7d1f1dea37f43e94",
+    "originalFilename": "IMG_2305.jpg",
+    "contentHash": "280c7d1f1dea37f43e9403b76ab8ae1bc1f80db145ce7f5df82049304f6b6c84",
+    "takenAt": "2026-09-27T06:32:25.000Z",
+    "takenAtSource": "exif",
+    "latitude": -17.305983333333334,
+    "longitude": 123.62654166666665,
+    "detectedLocationName": "Derby, Western Australia, Australia",
+    "derivatives": {
+      "thumb": "/photos/thumbs/280c7d1f1dea37f43e94.webp",
+      "large": "/photos/large/280c7d1f1dea37f43e94.webp",
+      "marker": "/photos/markers/280c7d1f1dea37f43e94.webp"
     }
   }
 ]

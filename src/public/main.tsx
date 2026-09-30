@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./styles.css";
+import { selectFeaturedPhoto } from "./photoSelection";
 import type { PhotoId, PublicData, PublicPhotoEntry } from "../shared/types";
 
 type LoadState =
@@ -27,8 +28,7 @@ type PhotoMapItem =
 
 const CLUSTER_RADIUS_KM = 5;
 const CLUSTER_DISABLE_ZOOM = 13;
-const MIN_LOADING_GUIDE_MS = 3000;
-const MAX_LOADING_GUIDE_MS = 5000;
+const INITIAL_PHOTO_READY_TIMEOUT_MS = 2500;
 
 function PublicApp() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
@@ -38,32 +38,37 @@ function PublicApp() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadData() {
-      const loadingStartedAt = Date.now();
-      const userInteraction = waitForUserInteraction(MAX_LOADING_GUIDE_MS);
       try {
         const response = await fetch(assetUrl("public-data.json"));
-        await Promise.all([
-          delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS),
-          userInteraction
-        ]);
         if (!response.ok) {
           throw new Error("Could not load public photo data.");
         }
 
         const data = (await response.json()) as PublicData;
-        const params = new URLSearchParams(window.location.search);
-        const urlTags = params.get("tags")?.split(",").filter(Boolean) ?? [];
+        const initialView = getInitialViewState(
+          data,
+          new URLSearchParams(window.location.search)
+        );
+        const initialPhoto = getInitialFeaturedPhoto(data.photos, initialView);
+
+        await waitForInitialPhoto(initialPhoto, INITIAL_PHOTO_READY_TIMEOUT_MS);
+
+        if (!isMounted) {
+          return;
+        }
 
         setLoadState({ status: "loaded", data });
-        setSelectedTags(urlTags.filter((tag) => data.tags.includes(tag)));
-        setTitleQuery(params.get("q") ?? "");
-        setFeaturedId(params.get("photo") ?? data.photos[0]?.id ?? null);
+        setSelectedTags(initialView.selectedTags);
+        setTitleQuery(initialView.titleQuery);
+        setFeaturedId(initialPhoto?.id ?? null);
       } catch (error) {
-        await Promise.all([
-          delayRemaining(loadingStartedAt, MIN_LOADING_GUIDE_MS),
-          userInteraction
-        ]);
+        if (!isMounted) {
+          return;
+        }
+
         setLoadState({
           status: "error",
           message: error instanceof Error ? error.message : "Could not load photos."
@@ -72,6 +77,10 @@ function PublicApp() {
     }
 
     void loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const data = loadState.status === "loaded" ? loadState.data : null;
@@ -80,22 +89,10 @@ function PublicApp() {
       return [];
     }
 
-    const normalizedTitleQuery = titleQuery.trim().toLocaleLowerCase();
-
-    return data.photos.filter((photo) => {
-      const matchesTags = selectedTags.every((tag) => photo.tags.includes(tag));
-      const matchesTitle =
-        normalizedTitleQuery.length === 0 ||
-        photo.title.toLocaleLowerCase().includes(normalizedTitleQuery);
-
-      return matchesTags && matchesTitle;
-    });
+    return filterPhotos(data.photos, selectedTags, titleQuery);
   }, [data, selectedTags, titleQuery]);
 
-  const featuredPhoto =
-    filteredPhotos.find((photo) => photo.id === featuredId) ??
-    filteredPhotos[0] ??
-    null;
+  const featuredPhoto = selectFeaturedPhoto(filteredPhotos, featuredId);
 
   useEffect(() => {
     if (featuredPhoto && featuredPhoto.id !== featuredId) {
@@ -147,7 +144,7 @@ function PublicApp() {
   }
 
   if (loadState.status === "loading") {
-    return <LoadingGuide />;
+    return <LoadingPhotos />;
   }
 
   if (loadState.status === "error") {
@@ -219,36 +216,31 @@ function PublicApp() {
   );
 }
 
-function LoadingGuide() {
+function LoadingPhotos() {
   return (
-    <main className="loading-shell" aria-live="polite" aria-label="Loading photos">
-      <div className="loading-guide">
-        <section className="loading-map-guide" aria-hidden="true">
-          <div className="loading-title-card">
-            <strong>Big Stuff</strong>
-            <span>Tap or scroll to start</span>
-          </div>
-          <div className="guide-callout map-callout">Select from the map</div>
-        </section>
-        <section className="loading-panel-guide" aria-hidden="true">
-          <div className="guide-filter-row" />
-          <div className="guide-image-window">
-            <div className="guide-callout image-callout">Click for more info</div>
-          </div>
-          <div className="guide-meta-row">
+    <main
+      className="loading-shell"
+      aria-busy="true"
+      aria-live="polite"
+      aria-label="Loading photos"
+    >
+      <section className="loading-card">
+        <div className="pineapple-loader" role="img" aria-label="Pineapple loading">
+          <div className="pineapple-crown" aria-hidden="true">
             <span />
             <span />
-            <div className="guide-callout coordinates-callout">Visit the location</div>
+            <span />
           </div>
-          <div className="guide-list">
-            <div className="guide-callout list-callout">Scroll the list</div>
+          <div className="pineapple-body" aria-hidden="true">
             <span />
             <span />
             <span />
             <span />
           </div>
-        </section>
-      </div>
+        </div>
+        <h1>Loading photos</h1>
+        <p>The pineapple is getting the photo collection ready.</p>
+      </section>
     </main>
   );
 }
@@ -592,10 +584,10 @@ function PhotoRail({
 
     isProgrammaticScrollRef.current = true;
     window.requestAnimationFrame(() => {
-      active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+      active.scrollIntoView({ inline: "center", block: "nearest", behavior: "auto" });
       window.setTimeout(() => {
         isProgrammaticScrollRef.current = false;
-      }, 450);
+      }, 100);
     });
   }, [featuredId]);
 
@@ -840,28 +832,68 @@ function toRadians(value: number): number {
   return (value * Math.PI) / 180;
 }
 
-function delayRemaining(startedAt: number, minimumMilliseconds: number): Promise<void> {
-  const elapsed = Date.now() - startedAt;
-  const remaining = Math.max(0, minimumMilliseconds - elapsed);
-  return new Promise((resolve) => window.setTimeout(resolve, remaining));
+function getInitialViewState(data: PublicData, params: URLSearchParams) {
+  const urlTags = params.get("tags")?.split(",").filter(Boolean) ?? [];
+
+  return {
+    selectedTags: urlTags.filter((tag) => data.tags.includes(tag)),
+    titleQuery: params.get("q") ?? "",
+    requestedPhotoId: params.get("photo")
+  };
 }
 
-function waitForUserInteraction(timeoutMilliseconds: number): Promise<void> {
+function getInitialFeaturedPhoto(
+  photos: PublicPhotoEntry[],
+  viewState: ReturnType<typeof getInitialViewState>
+): PublicPhotoEntry | null {
+  const filteredPhotos = filterPhotos(
+    photos,
+    viewState.selectedTags,
+    viewState.titleQuery
+  );
+
+  return selectFeaturedPhoto(filteredPhotos, viewState.requestedPhotoId);
+}
+
+function filterPhotos(
+  photos: PublicPhotoEntry[],
+  selectedTags: string[],
+  titleQuery: string
+): PublicPhotoEntry[] {
+  const normalizedTitleQuery = titleQuery.trim().toLocaleLowerCase();
+
+  return photos.filter((photo) => {
+    const matchesTags = selectedTags.every((tag) => photo.tags.includes(tag));
+    const matchesTitle =
+      normalizedTitleQuery.length === 0 ||
+      photo.title.toLocaleLowerCase().includes(normalizedTitleQuery);
+
+    return matchesTags && matchesTitle;
+  });
+}
+
+function waitForInitialPhoto(
+  photo: PublicPhotoEntry | null,
+  timeoutMilliseconds: number
+): Promise<void> {
+  if (!photo) {
+    return Promise.resolve();
+  }
+
   return new Promise((resolve) => {
-    const events = ["pointerdown", "keydown", "wheel", "touchstart"];
     const timeout = window.setTimeout(resolveOnce, timeoutMilliseconds);
+    const image = new Image();
 
     function resolveOnce() {
       window.clearTimeout(timeout);
-      for (const event of events) {
-        window.removeEventListener(event, resolveOnce);
-      }
+      image.onload = null;
+      image.onerror = null;
       resolve();
     }
 
-    for (const event of events) {
-      window.addEventListener(event, resolveOnce, { once: true });
-    }
+    image.onload = resolveOnce;
+    image.onerror = resolveOnce;
+    image.src = assetUrl(photo.derivatives.large);
   });
 }
 
