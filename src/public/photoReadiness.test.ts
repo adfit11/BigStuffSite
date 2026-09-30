@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  filterPhotos,
+  getInitialFeaturedPhoto,
   getInitialFilteredPhotos,
   getInitialViewState,
   markerImageUrls,
@@ -27,6 +29,85 @@ test("initial filtered photos match URL tag and title filters", () => {
   assert.deepEqual(
     getInitialFilteredPhotos(data.photos, viewState).map((photo) => photo.id),
     ["banana"]
+  );
+});
+
+test("filtered photos are ordered newest first by takenAt", () => {
+  const oldest = photoEntry("oldest", {
+    takenAt: "2024-01-01T00:00:00.000Z"
+  });
+  const newest = photoEntry("newest", {
+    takenAt: "2026-01-01T00:00:00.000Z"
+  });
+  const middle = photoEntry("middle", {
+    takenAt: "2025-01-01T00:00:00.000Z"
+  });
+
+  assert.deepEqual(
+    filterPhotos([oldest, newest, middle], [], "").map((photo) => photo.id),
+    ["newest", "middle", "oldest"]
+  );
+});
+
+test("filtered photos keep source order when takenAt values tie", () => {
+  const first = photoEntry("first", {
+    takenAt: "2026-01-01T00:00:00.000Z"
+  });
+  const second = photoEntry("second", {
+    takenAt: "2026-01-01T00:00:00.000Z"
+  });
+  const older = photoEntry("older", {
+    takenAt: "2025-01-01T00:00:00.000Z"
+  });
+
+  assert.deepEqual(
+    filterPhotos([first, older, second], [], "").map((photo) => photo.id),
+    ["first", "second", "older"]
+  );
+});
+
+test("filtered photos do not mutate the source array", () => {
+  const oldest = photoEntry("oldest", {
+    takenAt: "2024-01-01T00:00:00.000Z"
+  });
+  const newest = photoEntry("newest", {
+    takenAt: "2026-01-01T00:00:00.000Z"
+  });
+  const photos = [oldest, newest];
+
+  const filtered = filterPhotos(photos, [], "");
+
+  assert.deepEqual(photos.map((photo) => photo.id), ["oldest", "newest"]);
+  assert.deepEqual(filtered.map((photo) => photo.id), ["newest", "oldest"]);
+});
+
+test("initial featured photo remains newest after ordering matching photos", () => {
+  const oldest = photoEntry("oldest", {
+    takenAt: "2024-01-01T00:00:00.000Z"
+  });
+  const newest = photoEntry("newest", {
+    takenAt: "2026-01-01T00:00:00.000Z"
+  });
+  const data = publicData([oldest, newest]);
+  const viewState = getInitialViewState(data, new URLSearchParams());
+
+  assert.equal(getInitialFeaturedPhoto(data.photos, viewState)?.id, "newest");
+});
+
+test("initial featured photo preserves explicit URL selection after ordering", () => {
+  const older = photoEntry("older", {
+    takenAt: "2024-01-01T00:00:00.000Z"
+  });
+  const newer = photoEntry("newer", {
+    takenAt: "2026-01-01T00:00:00.000Z"
+  });
+  const data = publicData([older, newer]);
+  const viewState = getInitialViewState(data, new URLSearchParams("photo=older"));
+
+  assert.equal(getInitialFeaturedPhoto(data.photos, viewState)?.id, "older");
+  assert.deepEqual(
+    getInitialFilteredPhotos(data.photos, viewState).map((photo) => photo.id),
+    ["newer", "older"]
   );
 });
 

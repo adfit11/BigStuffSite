@@ -53,6 +53,8 @@ export function filterPhotos(
       photo.title.toLocaleLowerCase().includes(normalizedTitleQuery);
 
     return matchesTags && matchesTitle;
+  }).sort((photoA, photoB) => {
+    return Date.parse(photoB.takenAt) - Date.parse(photoA.takenAt);
   });
 }
 

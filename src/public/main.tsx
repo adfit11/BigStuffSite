@@ -381,7 +381,22 @@ function PhotoMap({
     <section className="map-shell" aria-label="Photo map">
       <div ref={elementRef} className="map-panel" />
       <header className="site-title">
-        <h1>Big Stuff</h1>
+        <div className="brand-lockup" aria-label="Big Stuff">
+          <div className="brand-pineapple" aria-hidden="true">
+            <div className="brand-pineapple-crown">
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className="brand-pineapple-body">
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+          <h1>Big Stuff</h1>
+        </div>
         <p>{totalPhotoCount} Big Things found. Millions to go.</p>
       </header>
     </section>
