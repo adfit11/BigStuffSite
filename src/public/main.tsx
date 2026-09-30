@@ -3,6 +3,14 @@ import { createRoot } from "react-dom/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./styles.css";
+import {
+  filterPhotos,
+  getInitialFeaturedPhoto,
+  getInitialFilteredPhotos,
+  getInitialViewState,
+  markerImageUrls,
+  waitForImageUrls
+} from "./photoReadiness";
 import { selectFeaturedPhoto } from "./photoSelection";
 import type { PhotoId, PublicData, PublicPhotoEntry } from "../shared/types";
 
@@ -29,6 +37,7 @@ type PhotoMapItem =
 const CLUSTER_RADIUS_KM = 5;
 const CLUSTER_DISABLE_ZOOM = 13;
 const INITIAL_PHOTO_READY_TIMEOUT_MS = 2500;
+const INITIAL_MARKER_READY_TIMEOUT_MS = 2500;
 
 function PublicApp() {
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
@@ -52,9 +61,19 @@ function PublicApp() {
           data,
           new URLSearchParams(window.location.search)
         );
+        const initialPhotos = getInitialFilteredPhotos(data.photos, initialView);
         const initialPhoto = getInitialFeaturedPhoto(data.photos, initialView);
 
-        await waitForInitialPhoto(initialPhoto, INITIAL_PHOTO_READY_TIMEOUT_MS);
+        await Promise.all([
+          waitForImageUrls(
+            initialPhoto ? [assetUrl(initialPhoto.derivatives.large)] : [],
+            INITIAL_PHOTO_READY_TIMEOUT_MS
+          ),
+          waitForImageUrls(
+            markerImageUrls(initialPhotos, assetUrl),
+            INITIAL_MARKER_READY_TIMEOUT_MS
+          )
+        ]);
 
         if (!isMounted) {
           return;
@@ -830,71 +849,6 @@ function distanceInKilometers(
 
 function toRadians(value: number): number {
   return (value * Math.PI) / 180;
-}
-
-function getInitialViewState(data: PublicData, params: URLSearchParams) {
-  const urlTags = params.get("tags")?.split(",").filter(Boolean) ?? [];
-
-  return {
-    selectedTags: urlTags.filter((tag) => data.tags.includes(tag)),
-    titleQuery: params.get("q") ?? "",
-    requestedPhotoId: params.get("photo")
-  };
-}
-
-function getInitialFeaturedPhoto(
-  photos: PublicPhotoEntry[],
-  viewState: ReturnType<typeof getInitialViewState>
-): PublicPhotoEntry | null {
-  const filteredPhotos = filterPhotos(
-    photos,
-    viewState.selectedTags,
-    viewState.titleQuery
-  );
-
-  return selectFeaturedPhoto(filteredPhotos, viewState.requestedPhotoId);
-}
-
-function filterPhotos(
-  photos: PublicPhotoEntry[],
-  selectedTags: string[],
-  titleQuery: string
-): PublicPhotoEntry[] {
-  const normalizedTitleQuery = titleQuery.trim().toLocaleLowerCase();
-
-  return photos.filter((photo) => {
-    const matchesTags = selectedTags.every((tag) => photo.tags.includes(tag));
-    const matchesTitle =
-      normalizedTitleQuery.length === 0 ||
-      photo.title.toLocaleLowerCase().includes(normalizedTitleQuery);
-
-    return matchesTags && matchesTitle;
-  });
-}
-
-function waitForInitialPhoto(
-  photo: PublicPhotoEntry | null,
-  timeoutMilliseconds: number
-): Promise<void> {
-  if (!photo) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => {
-    const timeout = window.setTimeout(resolveOnce, timeoutMilliseconds);
-    const image = new Image();
-
-    function resolveOnce() {
-      window.clearTimeout(timeout);
-      image.onload = null;
-      image.onerror = null;
-      resolve();
-    }
-
-    image.onload = resolveOnce;
-    image.onerror = resolveOnce;
-    image.src = assetUrl(photo.derivatives.large);
-  });
 }
 
 function assetUrl(path: string): string {
