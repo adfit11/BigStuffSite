@@ -36,6 +36,7 @@ type PhotoMapItem =
 
 const CLUSTER_RADIUS_KM = 5;
 const CLUSTER_DISABLE_ZOOM = 13;
+const FEATURED_PHOTO_CONTEXT_ZOOM = 6;
 const INITIAL_PHOTO_READY_TIMEOUT_MS = 2500;
 const INITIAL_MARKER_READY_TIMEOUT_MS = 2500;
 
@@ -370,7 +371,7 @@ function PhotoMap({
 
     map.flyTo(
       [featuredPhoto.latitude, featuredPhoto.longitude],
-      Math.max(map.getZoom(), CLUSTER_DISABLE_ZOOM),
+      FEATURED_PHOTO_CONTEXT_ZOOM,
       {
         duration: 0.7
       }
