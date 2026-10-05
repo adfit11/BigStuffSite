@@ -8,6 +8,13 @@ import type {
   ImportedPhotoEntry,
   PhotoId
 } from "../shared/types";
+import {
+  compareEffectiveTakenAt,
+  composeTakenAtOverride,
+  getEffectiveTakenAt,
+  getTakenTimestampParts
+} from "./takenTimestamp";
+import type { TakenTimestampParts } from "./takenTimestamp";
 
 type AdminView = "incomplete" | "omitted" | "all" | "tags";
 type PhotoSortMode = "date" | "name";
@@ -336,7 +343,7 @@ function PhotoQueue({
               <img src={photo.derivatives.thumb} alt="" />
               <span>
                 <strong>{title}</strong>
-                <small>{formatDate(getPhotoTakenAt(photo, photoEditorial))}</small>
+                <small>{formatDate(getEffectiveTakenAt(photo, photoEditorial))}</small>
               </span>
               <em
                 className={
@@ -364,11 +371,28 @@ function PhotoEditor({
   tagList: string[];
   onChange: (updates: Partial<EditorialPhotoEntry>) => void;
 }) {
+  const draft = { ...EMPTY_EDITORIAL_PHOTO, ...editorial };
+  const effectiveTakenAt = photo ? getEffectiveTakenAt(photo, draft) : "";
+  const [takenParts, setTakenParts] = useState<TakenTimestampParts>(() =>
+    getTakenTimestampParts(effectiveTakenAt)
+  );
+
+  useEffect(() => {
+    setTakenParts(getTakenTimestampParts(effectiveTakenAt));
+  }, [effectiveTakenAt, photo?.id]);
+
+  function updateTakenParts(nextParts: TakenTimestampParts) {
+    setTakenParts(nextParts);
+    const takenAtOverride = composeTakenAtOverride(nextParts);
+    if (takenAtOverride) {
+      onChange({ takenAtOverride });
+    }
+  }
+
   if (!photo) {
     return <aside className="editor-panel">Select a photo to edit.</aside>;
   }
 
-  const draft = { ...EMPTY_EDITORIAL_PHOTO, ...editorial };
   const latitude = draft.latitudeOverride ?? photo.latitude;
   const longitude = draft.longitudeOverride ?? photo.longitude;
   const locationName =
@@ -420,16 +444,28 @@ function PhotoEditor({
         />
       </label>
 
-      <label>
-        Taken date
-        <input
-          type="datetime-local"
-          value={toDatetimeLocal(draft.takenAtOverride ?? photo.takenAt)}
-          onChange={(event) =>
-            onChange({ takenAtOverride: fromDatetimeLocal(event.target.value) })
-          }
-        />
-      </label>
+      <div className="field-grid">
+        <label>
+          Taken date
+          <input
+            type="date"
+            value={takenParts.date}
+            onChange={(event) =>
+              updateTakenParts({ ...takenParts, date: event.target.value })
+            }
+          />
+        </label>
+        <label>
+          Taken time
+          <input
+            type="time"
+            value={takenParts.time}
+            onChange={(event) =>
+              updateTakenParts({ ...takenParts, time: event.target.value })
+            }
+          />
+        </label>
+      </div>
 
       <div className="field-grid">
         <label>
@@ -608,10 +644,7 @@ function comparePhotos(
     return byTitle === 0 ? firstPhoto.id.localeCompare(secondPhoto.id) : byTitle;
   }
 
-  const firstDate = new Date(getPhotoTakenAt(firstPhoto, firstEditorial)).getTime();
-  const secondDate = new Date(getPhotoTakenAt(secondPhoto, secondEditorial)).getTime();
-  const byDate = firstDate - secondDate;
-  return byDate === 0 ? firstPhoto.id.localeCompare(secondPhoto.id) : byDate;
+  return compareEffectiveTakenAt(firstPhoto, secondPhoto, editorial);
 }
 
 function getPhotoQueueTitle(
@@ -619,13 +652,6 @@ function getPhotoQueueTitle(
   editorial: EditorialPhotoEntry | undefined
 ): string {
   return editorial?.title || photo.originalFilename;
-}
-
-function getPhotoTakenAt(
-  photo: ImportedPhotoEntry,
-  editorial: EditorialPhotoEntry | undefined
-): string {
-  return editorial?.takenAtOverride ?? photo.takenAt;
 }
 
 function getTagUsageCounts(editorial: EditorialData): Map<string, number> {
@@ -646,22 +672,6 @@ function formatDate(value: string): string {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium"
   }).format(new Date(value));
-}
-
-function toDatetimeLocal(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-  return date.toISOString().slice(0, 16);
-}
-
-function fromDatetimeLocal(value: string): string | undefined {
-  if (!value) {
-    return undefined;
-  }
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
 }
 
 function parseOptionalNumber(value: string): number | undefined {
